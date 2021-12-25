@@ -1,0 +1,12 @@
+jpackage --input target/ \
+  --name WordProcessor \
+  --main-jar WordProcessor-jar-with-dependencies.jar \
+  --main-class wordprocessor.WordProcessor \
+  --type dmg \
+  --icon "icons.icns" \
+  --app-version "1.0.0" \
+  --vendor "Andrew's software" \
+  --copyright "Copyright 2021" \
+  --mac-package-name "Word Processor" \
+  --verbose \
+  --java-options '--enable-preview'
