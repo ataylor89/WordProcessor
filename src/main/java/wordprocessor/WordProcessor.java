@@ -65,7 +65,7 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     private JMenu file;
     private JMenuItem newFile, save, saveAs, open, downloadWebPage, exit;
     private JMenu colors;
-    private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite;
+    private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu theme;
     private JMenuItem nimbus, system, metal, ocean;
     private JMenu tools;
@@ -284,6 +284,8 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         tealwhite.addActionListener(this);
         purplewhite = new JMenuItem("Purple white");
         purplewhite.addActionListener(this);
+        seaTheme = new JMenuItem("Sea theme");
+        seaTheme.addActionListener(this);
         colors.add(fgcolor);
         colors.add(bgcolor);
         colors.add(whiteblack);
@@ -291,6 +293,7 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         colors.add(grayblue);
         colors.add(tealwhite);
         colors.add(purplewhite);
+        colors.add(seaTheme);
         theme = new JMenu("Theme");
         nimbus = new JMenuItem("Nimbus theme");
         nimbus.addActionListener(this);
@@ -603,6 +606,10 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         } else if (e.getSource() == purplewhite) {
             foregroundColor = Color.WHITE;
             backgroundColor = new Color(153, 0, 153, 255);
+            refreshColors();
+        } else if (e.getSource() == seaTheme) {
+            foregroundColor = Color.WHITE;
+            backgroundColor = new Color(0, 153, 255, 255);
             refreshColors();
         } else if (e.getSource() == nimbus) {
             setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
