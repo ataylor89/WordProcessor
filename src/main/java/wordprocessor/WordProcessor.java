@@ -36,11 +36,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -55,11 +52,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.text.BadLocationException;
 
 public class WordProcessor extends JFrame implements MenuListener, ActionListener {
@@ -69,8 +61,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     private JMenuItem newFile, save, saveAs, open, openURL, exit;
     private JMenu colors;
     private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
-    private JMenu theme;
-    private JMenuItem nimbus, system, metal, ocean;
     private JMenu tools;
     private JMenuItem tabSize, lineCount, characterCount, gotoLine, copyToClipboard;
     private JMenu email;
@@ -291,19 +281,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         colors.add(tealwhite);
         colors.add(purplewhite);
         colors.add(seaTheme);
-        theme = new JMenu("Theme");
-        nimbus = new JMenuItem("Nimbus theme");
-        nimbus.addActionListener(this);
-        system = new JMenuItem("System theme");
-        system.addActionListener(this);
-        metal = new JMenuItem("Metal theme");
-        metal.addActionListener(this);
-        ocean = new JMenuItem("Ocean theme");
-        ocean.addActionListener(this);
-        theme.add(nimbus);
-        theme.add(system);
-        theme.add(metal);
-        theme.add(ocean);
         tools = new JMenu("Tools");
         tabSize = new JMenuItem("Set tab size");
         tabSize.addActionListener(this);
@@ -335,7 +312,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         run.add(runPythonProgram);
         bar.add(file);
         bar.add(colors);
-        bar.add(theme);
         bar.add(tools);
         bar.add(email);
         bar.add(run);
@@ -354,39 +330,18 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         }
     }
 
-    public static void setupKeyStrokes() {
+    public void setupKeyStrokes() {
 	InputMap im = (InputMap) UIManager.get("TextArea.focusInputMap");
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
     }
 
-    public static void setLookAndFeel() {
+    public void setLookAndFeel() {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
             System.err.println(e);
         }
-	setupKeyStrokes();
-    }
-
-    private void setLookAndFeel(LookAndFeel lookAndFeel) {
-        try {
-            UIManager.setLookAndFeel(lookAndFeel);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-        SwingUtilities.updateComponentTreeUI(this);
-	setupKeyStrokes();
-    }
-
-    private void setLookAndFeel(String className) {
-        try {
-            UIManager.setLookAndFeel(className);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-        SwingUtilities.updateComponentTreeUI(this);
-	setupKeyStrokes();
     }
 
     private boolean isSaved() {
@@ -572,16 +527,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
             foregroundColor = Color.WHITE;
             backgroundColor = new Color(0, 153, 255, 255);
             refreshColors();
-        } else if (e.getSource() == nimbus) {
-            setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } else if (e.getSource() == system) {
-            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } else if (e.getSource() == metal) {
-            MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-            setLookAndFeel(new MetalLookAndFeel());
-        } else if (e.getSource() == ocean) {
-            MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-            setLookAndFeel(new MetalLookAndFeel());
         } else if (e.getSource() == tabSize) {
             Integer size = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, tabSize);
             tabWidth = size.intValue();
@@ -628,8 +573,9 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     }
 
     public static void main(String[] args) {
-        WordProcessor.setLookAndFeel();
         WordProcessor wordProcessor = new WordProcessor();
+        wordProcessor.setLookAndFeel();
+        wordProcessor.setupKeyStrokes();
         if (args.length > 0) 
             wordProcessor.setFilePath(args[0]);
         wordProcessor.createAndShowGui();
