@@ -36,8 +36,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -63,7 +66,7 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
 
     private JMenuBar bar;
     private JMenu file;
-    private JMenuItem newFile, save, saveAs, open, downloadWebPage, exit;
+    private JMenuItem newFile, save, saveAs, open, openURL, exit;
     private JMenu colors;
     private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu theme;
@@ -72,12 +75,8 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     private JMenuItem tabSize, lineCount, characterCount, gotoLine, copyToClipboard;
     private JMenu email;
     private JMenuItem sendEmail;
-    private JMenu compile;
-    private JMenuItem compileJavaProgram, compileCProgram, compileCPPProgram, compileNASMProgram;
-    private JMenu link;
-    private JMenuItem linkObjectCode;
     private JMenu run;
-    private JMenuItem runJavaProgram, runPythonProgram, runMachineCodeProgram;
+    private JMenuItem runJavaProgram, runPythonProgram;
     private JPanel panel;
     private JScrollPane scrollPane;
     private JTextArea textArea;
@@ -85,9 +84,9 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     private File currentFile;
     private Color foregroundColor, backgroundColor;
     private int tabWidth;
+    
 
     private class ProcessController extends Thread {
-
         private JFrame frame;
         private String title;
         private String cmd;
@@ -138,7 +137,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     }
 
     private class EmailPanel extends JPanel {
-
         private GridBagLayout gridbag;
         private JTextField from, to, subject;
         private JPasswordField password;
@@ -196,7 +194,6 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
     }
 
     private class JavaPanel extends JPanel {
-
         private GridBagLayout gridbag;
         private JTextField classpath, args;
 
@@ -259,15 +256,15 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         saveAs.addActionListener(this);
         open = new JMenuItem("Open");
         open.addActionListener(this);
-        downloadWebPage = new JMenuItem("Download web page");
-        downloadWebPage.addActionListener(this);
+        openURL = new JMenuItem("Open URL");
+        openURL.addActionListener(this);
         exit = new JMenuItem("Exit");
         exit.addActionListener(this);
         file.add(newFile);
         file.add(save);
         file.add(saveAs);
         file.add(open);
-        file.add(downloadWebPage);
+        file.add(openURL);
         file.add(exit);
         colors = new JMenu("Colors");
         fgcolor = new JMenuItem("Set foreground color");
@@ -328,49 +325,26 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         sendEmail = new JMenuItem("Send email");
         sendEmail.addActionListener(this);
         email.add(sendEmail);
-        compile = new JMenu("Compile");
-	compile.addMenuListener(this);
-        compileJavaProgram = new JMenuItem("Compile Java program");
-        compileJavaProgram.addActionListener(this);
-        compileCProgram = new JMenuItem("Compile C program");
-        compileCProgram.addActionListener(this);
-        compileCPPProgram = new JMenuItem("Compile C++ program");
-        compileCPPProgram.addActionListener(this);
-        compileNASMProgram = new JMenuItem("Compile NASM program");
-        compileNASMProgram.addActionListener(this);
-        compile.add(compileJavaProgram);
-        compile.add(compileCProgram);
-        compile.add(compileCPPProgram);
-        compile.add(compileNASMProgram);
-        link = new JMenu("Link");
-	link.addMenuListener(this);
-        linkObjectCode = new JMenuItem("Link object code");
-        linkObjectCode.addActionListener(this);
-        link.add(linkObjectCode);
         run = new JMenu("Run");
 	run.addMenuListener(this);
         runJavaProgram = new JMenuItem("Run Java program");
         runJavaProgram.addActionListener(this);
         runPythonProgram = new JMenuItem("Run Python program");
         runPythonProgram.addActionListener(this);
-        runMachineCodeProgram = new JMenuItem("Run machine code program");
-        runMachineCodeProgram.addActionListener(this);
         run.add(runJavaProgram);
         run.add(runPythonProgram);
-        run.add(runMachineCodeProgram);
         bar.add(file);
         bar.add(colors);
         bar.add(theme);
         bar.add(tools);
         bar.add(email);
-        bar.add(compile);
-        bar.add(link);
         bar.add(run);
         setJMenuBar(bar);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setTabSize(3);
+        textArea.setLineWrap(true);
         scrollPane = new JScrollPane(textArea);
         panel.add(scrollPane);
         add(panel);
@@ -415,8 +389,19 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
 	setupKeyStrokes();
     }
 
+    private boolean isSaved() {
+        try {
+            String fileContents = Files.readString(currentFile.toPath());
+            if (textArea.getText().equals(fileContents))
+                return true;
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+        return false;
+    }
+    
     private void promptForSave() {
-        if (currentFile != null) {
+        if (currentFile != null && !isSaved()) {
             int option = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
             if (option == JOptionPane.YES_OPTION) {
                 saveToFile(currentFile);
@@ -449,7 +434,7 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
 
     private void openFile(File file) {
         try {
-            String text = new String(Files.readAllBytes(file.toPath()));
+            String text = Files.readString(file.toPath());
             textArea.setText(text);
         } catch (IOException e) {
             System.err.println(e);
@@ -493,36 +478,12 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
             System.err.println(e);
         }
     }
-
-    private String getFilenameWithoutExtension() {
-        String filename = currentFile.getName();
-        int lio = filename.lastIndexOf(".");
-        if (lio > 0) {
-            filename = filename.substring(0, lio);
-        }
-        return filename;
-    }
-
-    private String getPathWithoutExtension() {
-        String path = currentFile.getPath();
-        int lio = path.lastIndexOf(".");
-        if (lio > 0) {
-            path = path.substring(0, lio);
-        }
-        return path;
-    }
-
+    
     private void enableDisableMenuItems() {
         save.setEnabled(currentFile != null);
         sendEmail.setEnabled(currentFile != null);
-        compileJavaProgram.setEnabled(currentFile != null);
-        compileCProgram.setEnabled(currentFile != null);
-        compileCPPProgram.setEnabled(currentFile != null);
-        compileNASMProgram.setEnabled(currentFile != null);
         runJavaProgram.setEnabled(currentFile != null);
         runPythonProgram.setEnabled(currentFile != null);
-        linkObjectCode.setEnabled(currentFile != null);
-        runMachineCodeProgram.setEnabled(currentFile != null);
     }
 
     @Override
@@ -555,10 +516,10 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
         } else if (e.getSource() == open) {
             promptForSave();
             openFile();
-        } else if (e.getSource() == downloadWebPage) {
+        } else if (e.getSource() == openURL) {
             promptForSave();
             newFile();
-            String address = JOptionPane.showInputDialog(this, "URL:", "Download web page", JOptionPane.QUESTION_MESSAGE);
+            String address = JOptionPane.showInputDialog(this, "URL:", "Open URL", JOptionPane.QUESTION_MESSAGE);
             try {
                 URL url = new URL(address);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -655,78 +616,22 @@ public class WordProcessor extends JFrame implements MenuListener, ActionListene
                 return;
             }
             email(panel.getTo(), panel.getFrom(), panel.getSubject(), textArea.getText(), panel.getFrom(), panel.getPassword());
-        } else if (e.getSource() == compileJavaProgram) {
-            String classpath = JOptionPane.showInputDialog(this, "Classpath:", "Classpath", JOptionPane.QUESTION_MESSAGE);
-            String cmd = "javac ";
-            if (classpath != null && classpath.length() > 0) {
-                cmd += "-classpath " + classpath + " ";
-            }
-            cmd += currentFile.getPath();
-            ProcessController process = new ProcessController(this, "Compiling Java program...", cmd);
-            process.start();
-        } else if (e.getSource() == compileCProgram) {
-            String cmd = "gcc " + currentFile.getPath() + " -o " + getPathWithoutExtension();
-            ProcessController process = new ProcessController(this, "Compiling C program with gcc...", cmd);
-            process.start();
-        } else if (e.getSource() == compileCPPProgram) {
-            String cmd = "g++ -c " + currentFile.getPath() + " -o " + getPathWithoutExtension() + ".o";
-            ProcessController process = new ProcessController(this, "Compiling C++ program with g++", cmd);
-            process.start();
-        } else if (e.getSource() == compileNASMProgram) {
-            String cmd = "nasm -fmacho64 " + currentFile.getPath();
-            ProcessController process = new ProcessController(this, "Compiling NASM program...", cmd);
-            process.start();
-        } else if (e.getSource() == linkObjectCode) {
-            String sharedLibraries = JOptionPane.showInputDialog(this, "Shared libraries:", "Shared libraries", JOptionPane.QUESTION_MESSAGE);
-            String cmd = "ld -macosx_version_min 10.7 ";
-            if (sharedLibraries != null && sharedLibraries.length() > 0) {
-                cmd += sharedLibraries + " ";
-            }
-            cmd += getPathWithoutExtension() + ".o -o " + getPathWithoutExtension();
-            ProcessController process = new ProcessController(this, "Linking object code with ld...", cmd);
-            process.start();
         } else if (e.getSource() == runJavaProgram) {
-            JavaPanel panel = new JavaPanel();
-            String[] options = new String[]{"Cancel", "OK"};
-            int value = JOptionPane.showOptionDialog(this, panel, "Classpath and Args", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-            if (value == 0) {
-                return;
-            }
-            String classpath = panel.getClasspath();
-            String args = panel.getArgs();
-            if (classpath == null || classpath.length() == 0) {
-                classpath = currentFile.getParent();
-            }
-            String classname = getFilenameWithoutExtension();
-            String cmd = "java -classpath " + classpath + " " + classname;
-            if (args != null & args.length() > 0) {
-                cmd += " " + args;
-            }
+            String cmd = "java " + currentFile.getPath();
             ProcessController process = new ProcessController(this, "Running Java program...", cmd);
             process.start();
         } else if (e.getSource() == runPythonProgram) {
-	    String args = JOptionPane.showInputDialog(this, "Args:", "Runtime arguments", JOptionPane.QUESTION_MESSAGE);
-            String cmd = "python " + currentFile.getPath();
-	    if (args != null && args.length() > 0)
-	        cmd += " " + args;
+	    String cmd = "python " + currentFile.getPath();
             ProcessController process = new ProcessController(this, "Running Python program...", cmd);
             process.start();
-        } else if (e.getSource() == runMachineCodeProgram) {
-	    String args = JOptionPane.showInputDialog(this, "Args:", "Runtime arguments", JOptionPane.QUESTION_MESSAGE);
-            String cmd = getPathWithoutExtension();
-	    if (args != null && args.length() > 0)
-		cmd += " " + args;
-            ProcessController process = new ProcessController(this, "Running machine code program...", cmd);
-            process.start();
-        }
+        } 
     }
 
     public static void main(String[] args) {
         WordProcessor.setLookAndFeel();
         WordProcessor wordProcessor = new WordProcessor();
-        if (args.length > 0) {
+        if (args.length > 0) 
             wordProcessor.setFilePath(args[0]);
-        }
         wordProcessor.createAndShowGui();
         wordProcessor.setVisible(true);
     }
