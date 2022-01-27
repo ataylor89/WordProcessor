@@ -70,7 +70,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     private Color foregroundColor, backgroundColor;
     private JDialog consoleDialog;
     private Console console;
-    private EmailForm emailPanel;
+    private EmailForm emailForm;
     
     public WordProcessor() {
         super("Word Processor");
@@ -167,7 +167,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         consoleDialog = new JDialog();
         consoleDialog.setSize(600, 500);
         consoleDialog.add(sp);
-        emailPanel = new EmailForm();
+        emailForm = new EmailForm();
     }
 
     public void setupKeyStrokes() {
@@ -198,9 +198,8 @@ public class WordProcessor extends JFrame implements ActionListener {
     private void promptForSave() {
         if (currentFile != null && !isSaved()) {
             int option = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
-            if (option == JOptionPane.YES_OPTION) {
+            if (option == JOptionPane.YES_OPTION) 
                 saveToFile(currentFile);
-            }
         }
     }
 
@@ -273,15 +272,15 @@ public class WordProcessor extends JFrame implements ActionListener {
 
     private void sendEmail() {
         String[] options = new String[]{"Cancel", "Send"};
-        int option = JOptionPane.showOptionDialog(this, panel, "Compose an email", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
-        if (option == JOptionPane.OK_OPTION)
-            sendEmail(emailPanel.getTo(), 
-                    emailPanel.getFrom(), 
-                    emailPanel.getSubject(), 
+        int option = JOptionPane.showOptionDialog(null, emailForm, "Compose an email", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[1]);
+        if (option == 1)
+            sendEmail(emailForm.getTo(), 
+                    emailForm.getFrom(), 
+                    emailForm.getSubject(), 
                     textArea.getText(), 
-                    emailPanel.getFrom(), 
-                    emailPanel.getPassword());
-        emailPanel.clear();
+                    emailForm.getFrom(), 
+                    emailForm.getPassword());
+        emailForm.clear();
     }
     
     private void sendEmail(String to, String from, String subject, String body, String username, String password) {
