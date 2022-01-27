@@ -162,8 +162,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.add(scrollPane);
         add(panel);
         fileChooser = new JFileChooser();
-        if (currentFile != null) 
-            openFile(currentFile);
         console = new Console();
         JScrollPane sp = new JScrollPane(console);
         consoleDialog = new JDialog();
@@ -235,6 +233,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         try {
             String text = Files.readString(file.toPath());
             textArea.setText(text);
+            currentFile = file;
             refreshMenuItems();
         } catch (IOException e) {
             System.err.println(e);
@@ -245,8 +244,8 @@ public class WordProcessor extends JFrame implements ActionListener {
         int option = fileChooser.showOpenDialog(this);
 
         if (option == JFileChooser.APPROVE_OPTION) {
-            currentFile = fileChooser.getSelectedFile();
-            openFile(currentFile);
+            File f = fileChooser.getSelectedFile();
+            openFile(f);
         }
     }
     
@@ -410,22 +409,14 @@ public class WordProcessor extends JFrame implements ActionListener {
             console.run(cmd);           
         } 
     }
-
-    public void setFile(String path) {
-        currentFile = new File(path);
-    }
-    
-    public File getFile() {
-        return currentFile;
-    }
     
     public static void main(String[] args) {
         WordProcessor wordProcessor = new WordProcessor();
         wordProcessor.setLookAndFeel();
         wordProcessor.setupKeyStrokes();
-        if (args.length > 0) 
-            wordProcessor.setFile(args[0]);
         wordProcessor.createAndShowGui();
         wordProcessor.setVisible(true);
+        if (args.length > 0)
+            wordProcessor.openFile(new File(args[0]));
     }
 }
