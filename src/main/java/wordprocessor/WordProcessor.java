@@ -166,22 +166,21 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.add(scrollPane);
         add(panel);
         fileChooser = new JFileChooser();
-        console = new Console();
+        console = new Console(config);
         JScrollPane sp = new JScrollPane(console);
         consoleDialog = new JDialog(this, "Console");
         consoleDialog.setSize(600, 500);
         consoleDialog.add(sp);
-        emailForm = new EmailForm();
+        emailForm = new EmailForm(config);
+        refreshColors();
+        refreshMenuItems();
     }
     
     public void loadSettings() {
         logger.info("Loading settings");
         config.loadConfig();
-        String prefix = config.getPrefix();
         foregroundColor = config.getForegroundColor();
         backgroundColor = config.getBackgroundColor();
-        refreshColors();
-        console.setPrefix(prefix);
     }
 
     public void setupKeyStrokes() {
@@ -294,7 +293,7 @@ public class WordProcessor extends JFrame implements ActionListener {
                     textArea.getText(), 
                     emailForm.getFrom(), 
                     emailForm.getPassword());
-        emailForm.clear();
+        emailForm.reset();
     }
     
     private void sendEmail(String to, String from, String subject, String body, String username, String password) {
@@ -423,10 +422,10 @@ public class WordProcessor extends JFrame implements ActionListener {
     
     public static void main(String[] args) {
         WordProcessor wordProcessor = new WordProcessor();
+        wordProcessor.loadSettings();
         wordProcessor.setLookAndFeel();
         wordProcessor.setupKeyStrokes();
         wordProcessor.createAndShowGui();
-        wordProcessor.loadSettings();
         wordProcessor.setVisible(true);
         if (args.length > 0)
             wordProcessor.openFile(new File(args[0]));

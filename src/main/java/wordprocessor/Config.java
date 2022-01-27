@@ -31,6 +31,8 @@ public class Config {
         defaultProps.put("FGCOLOR", "rgba(0,0,0,255)");
         defaultProps.put("BGCOLOR", "rgba(255,255,255,255)");
         defaultProps.put("PREFIX", "%");
+        defaultProps.put("EMAIL_SENDER", "");
+        defaultProps.put("EMAIL_RECIPIENT", "");
         return defaultProps;
     }
  
@@ -96,6 +98,14 @@ public class Config {
     
     public String getPrefix() {
         return properties.getProperty("PREFIX");
+    }
+    
+    public String getEmailSender() {
+        return properties.getProperty("EMAIL_SENDER");
+    }
+    
+    public String getEmailRecipient() {
+        return properties.getProperty("EMAIL_RECIPIENT");
     }
     
     public void setProperties(Properties properties) {

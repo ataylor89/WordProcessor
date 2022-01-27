@@ -20,9 +20,11 @@ public class Console extends JTextArea {
     private Process process;
     private String prefix = "%";
     private int prefixPosition;
+    private Config config;
 
-    public Console() {
+    public Console(Config config) {      
         setupKeyStrokes();
+        this.prefix = config.getPrefix();
     }
 
     public void run(String cmd) {

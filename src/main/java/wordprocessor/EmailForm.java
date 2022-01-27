@@ -17,14 +17,18 @@ public class EmailForm extends JPanel {
     private GridBagLayout gridbag;
     private JTextField from, to, subject;
     private JPasswordField password;
+    private Config config;
 
-    public EmailForm() {
+    public EmailForm(Config config) {
+        this.config = config;
         gridbag = new GridBagLayout();
         super.setLayout(gridbag);
         JLabel fromLabel = new JLabel("From: ");
         from = new JTextField();
+        from.setText(config.getEmailSender());
         JLabel toLabel = new JLabel("To: ");
         to = new JTextField();
+        to.setText(config.getEmailRecipient());
         JLabel subjectLabel = new JLabel("Subject: ");
         subject = new JTextField();
         JLabel passwordLabel = new JLabel("Password: ");
@@ -69,9 +73,9 @@ public class EmailForm extends JPanel {
         return new String(password.getPassword());
     }
     
-    public void clear() {
-        from.setText("");
-        to.setText("");
+    public void reset() {
+        from.setText(config.getEmailSender());
+        to.setText(config.getEmailRecipient());
         subject.setText("");
         password.setText("");
     }
