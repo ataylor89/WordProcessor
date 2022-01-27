@@ -164,7 +164,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         fileChooser = new JFileChooser();
         console = new Console();
         JScrollPane sp = new JScrollPane(console);
-        consoleDialog = new JDialog();
+        consoleDialog = new JDialog(this, "Console");
         consoleDialog.setSize(600, 500);
         consoleDialog.add(sp);
         emailForm = new EmailForm();

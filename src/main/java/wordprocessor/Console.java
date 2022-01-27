@@ -18,7 +18,7 @@ import javax.swing.KeyStroke;
 public class Console extends JTextArea {
 
     private Process process;
-    private String prefix = "% ";
+    private String prefix = "%";
     private int prefixPosition;
 
     public Console() {
@@ -96,9 +96,11 @@ public class Console extends JTextArea {
     
     public void startNewLine() {
         String text = getText();
+        if (text.endsWith(prefix + " "))
+            return;
         if (!text.isEmpty() && !text.endsWith("\n"))
             append("\n");
-        append(prefix + " ");
+        append(prefix + " ");      
     }
     
     public void append(char c) {
