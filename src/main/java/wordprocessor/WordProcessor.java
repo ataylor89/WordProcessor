@@ -27,9 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.mail.Message;
@@ -48,6 +46,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.BadLocationException;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 
 public class WordProcessor extends JFrame implements ActionListener {
 
@@ -71,11 +71,15 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JDialog consoleDialog;
     private Console console;
     private EmailForm emailForm;
+    private Config config;
+    private Logger logger;
     
     public WordProcessor() {
         super("Word Processor");
+        logger = AppLogger.getLogger();
+        config = new Config();
     }
-
+    
     public void createAndShowGui() {
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -169,6 +173,16 @@ public class WordProcessor extends JFrame implements ActionListener {
         consoleDialog.add(sp);
         emailForm = new EmailForm();
     }
+    
+    public void loadSettings() {
+        logger.info("Loading settings");
+        config.loadConfig();
+        String prefix = config.getPrefix();
+        foregroundColor = config.getForegroundColor();
+        backgroundColor = config.getBackgroundColor();
+        refreshColors();
+        console.setPrefix(prefix);
+    }
 
     public void setupKeyStrokes() {
 	InputMap im = (InputMap) UIManager.get("TextArea.focusInputMap");
@@ -180,7 +194,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-            System.err.println(e);
+            logger.warning(e.toString());
         }
     }
 
@@ -190,7 +204,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             if (textArea.getText().equals(fileContents))
                 return true;
         } catch (IOException e) {
-            System.err.println(e);
+            logger.warning(e.toString());
         }
         return false;
     }
@@ -215,7 +229,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             bufferedWriter.write(text);
             refreshMenuItems();
         } catch (IOException ex) {
-            System.err.println(ex);
+            logger.warning(ex.toString());
         } 
     }
 
@@ -235,7 +249,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             currentFile = file;
             refreshMenuItems();
         } catch (IOException e) {
-            System.err.println(e);
+            logger.warning(e.toString());
         }
     }
 
@@ -264,9 +278,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             refreshMenuItems();
             currentFile = null;
         } catch (MalformedURLException ex) {
-            System.err.println(ex);
+            logger.warning(ex.toString());
         } catch (IOException ex) {
-            System.err.println(ex);
+            logger.warning(ex.toString());
         }
     }
 
@@ -284,17 +298,17 @@ public class WordProcessor extends JFrame implements ActionListener {
     }
     
     private void sendEmail(String to, String from, String subject, String body, String username, String password) {
-        String encryptedPassword = password.substring(0, 2) + String.join("", Collections.nCopies(password.length() - 4, "*")) + password.substring(password.length() - 2);
-        System.out.printf("To: %s\nFrom: %s\nSubject: %s\nUsername: %s\nPassword: %s\nBody: %s\n", to, from, subject, username, encryptedPassword, body);
+        String msg = String.format("To: %s\nFrom: %s\nSubject: %s\nUsername: %s\nPassword: %s\nBody: %s\n", to, from, subject, username, "*".repeat(password.length()), body);
+        logger.info(msg);
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
         prop.put("mail.smtp.starttls.enable", "true");
         prop.put("mail.smtp.auth", "true");
-        Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
+        Session session = Session.getInstance(prop, new Authenticator() {
             @Override
-            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
-                return new javax.mail.PasswordAuthentication(username, password);
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
             }
         });
         session.setDebug(true);
@@ -306,9 +320,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             message.setText(body);
             Transport.send(message);
         } catch (AddressException e) {
-            System.err.println(e);
+            logger.warning(e.toString());
         } catch (MessagingException e) {
-            System.err.println(e);
+            logger.warning(e.toString());
         }
     }
     
@@ -329,7 +343,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         try {
             textArea.setCaretPosition(textArea.getLineStartOffset(lineNumber));
         } catch (BadLocationException ex) {
-            System.err.println(ex);
+            logger.warning(ex.toString());
             textArea.setCaretPosition(textArea.getText().length());
         }
     }
@@ -414,6 +428,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         wordProcessor.setLookAndFeel();
         wordProcessor.setupKeyStrokes();
         wordProcessor.createAndShowGui();
+        wordProcessor.loadSettings();
         wordProcessor.setVisible(true);
         if (args.length > 0)
             wordProcessor.openFile(new File(args[0]));

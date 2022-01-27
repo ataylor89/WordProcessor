@@ -94,6 +94,15 @@ public class Console extends JTextArea {
         this.prefixPosition = prefixPosition;
     }
     
+    public void setPrefix(String prefix) {
+        if (prefix != null && prefix.length() > 0 && prefix.length() < 10)
+            this.prefix = prefix;
+    }
+    
+    public String getPrefix() {
+        return prefix;
+    }
+    
     public void startNewLine() {
         String text = getText();
         if (text.endsWith(prefix + " "))
