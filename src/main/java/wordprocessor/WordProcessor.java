@@ -298,8 +298,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     }
     
     private void sendEmail(String to, String from, String subject, String body, String username, String password) {
-        String msg = String.format("To: %s\nFrom: %s\nSubject: %s\nUsername: %s\nPassword: %s\nBody: %s\n", to, from, subject, username, "*".repeat(password.length()), body);
-        logger.info(msg);
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
