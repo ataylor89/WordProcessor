@@ -29,6 +29,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -324,16 +326,16 @@ public class WordProcessor extends JFrame implements ActionListener {
         textArea.setBackground(backgroundColor);
     }
     
-    private int promptForLineNumber() {
+    private void promptForLineNumber() {
         int lineNumber = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter a line number:", "Goto line", JOptionPane.QUESTION_MESSAGE));
-        int max = textArea.getLineCount() - 1;
-        if (lineNumber > max) 
-            return max;
-        if (lineNumber < 0) 
-           return 0;
-        return lineNumber;
+        try {
+            textArea.setCaretPosition(textArea.getLineStartOffset(lineNumber));
+        } catch (BadLocationException ex) {
+            System.err.println(ex);
+            textArea.setCaretPosition(textArea.getText().length());
+        }
     }
-
+   
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == newFile) {
@@ -391,12 +393,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         } else if (e.getSource() == characterCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getText().length() + " characters in the file");
         } else if (e.getSource() == gotoLine) {
-            try {
-                int lineNumber = promptForLineNumber();
-                textArea.setCaretPosition(textArea.getLineStartOffset(lineNumber));
-            } catch (BadLocationException le) {
-                System.err.println(le);
-            }
+            promptForLineNumber();
         } else if (e.getSource() == copyToClipboard) {
             StringSelection stringSelection = new StringSelection(textArea.getText());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
