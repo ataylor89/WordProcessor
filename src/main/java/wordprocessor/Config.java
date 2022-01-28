@@ -19,6 +19,7 @@ public class Config {
     private Pattern colorPattern;
     private Color foregroundColor;
     private Color backgroundColor;
+    private int tabSize;
     
     public Config() {
         logger = AppLogger.getLogger();
@@ -33,6 +34,7 @@ public class Config {
         defaultProps.put("PREFIX", "%");
         defaultProps.put("EMAIL_SENDER", "");
         defaultProps.put("EMAIL_RECIPIENT", "");
+        defaultProps.put("TAB_SIZE", "3");
         return defaultProps;
     }
  
@@ -106,6 +108,12 @@ public class Config {
     
     public String getEmailRecipient() {
         return properties.getProperty("EMAIL_RECIPIENT");
+    }
+    
+    public int getTabSize() {
+        if (tabSize <= 0)
+            tabSize = Integer.parseInt(properties.getProperty("TAB_SIZE"));
+        return tabSize;
     }
     
     public void setProperties(Properties properties) {

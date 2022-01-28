@@ -57,7 +57,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JMenu colors;
     private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu tools;
-    private JMenuItem lineCount, characterCount, gotoLine, copyToClipboard;
+    private JMenuItem setTabSize, lineCount, characterCount, gotoLine, copyToClipboard;
     private JMenu email;
     private JMenuItem sendEmail;
     private JMenu run;
@@ -73,6 +73,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     private EmailForm emailForm;
     private Config config;
     private Logger logger;
+    private int tabSize;
     
     public WordProcessor() {
         super("Word Processor");
@@ -129,6 +130,8 @@ public class WordProcessor extends JFrame implements ActionListener {
         colors.add(purplewhite);
         colors.add(seaTheme);
         tools = new JMenu("Tools");
+        setTabSize = new JMenuItem("Set tab size");
+        setTabSize.addActionListener(this);
         lineCount = new JMenuItem("Check line count");
         lineCount.addActionListener(this);
         characterCount = new JMenuItem("Check character count");
@@ -137,6 +140,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         gotoLine.addActionListener(this);
         copyToClipboard = new JMenuItem("Copy text to clipboard");
         copyToClipboard.addActionListener(this);
+        tools.add(setTabSize);
         tools.add(lineCount);
         tools.add(characterCount);
         tools.add(gotoLine);
@@ -162,6 +166,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
+        textArea.setTabSize(tabSize);
         scrollPane = new JScrollPane(textArea);
         panel.add(scrollPane);
         add(panel);
@@ -181,6 +186,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         config.loadConfig();
         foregroundColor = config.getForegroundColor();
         backgroundColor = config.getBackgroundColor();
+        tabSize = config.getTabSize();
     }
 
     public void setupKeyStrokes() {
@@ -397,6 +403,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             foregroundColor = Color.WHITE;
             backgroundColor = new Color(0, 153, 255, 255);
             refreshColors();
+        } else if (e.getSource() == setTabSize) {
+            tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, tabSize);
+            textArea.setTabSize(tabSize);
         } else if (e.getSource() == lineCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
         } else if (e.getSource() == characterCount) {

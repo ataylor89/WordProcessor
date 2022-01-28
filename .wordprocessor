@@ -2,3 +2,4 @@ PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 FGCOLOR=rgba(255,255,255,255)
 BGCOLOR=rgba(0,153,255,255)
 PREFIX=%
+TAB_SIZE=3
