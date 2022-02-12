@@ -29,6 +29,7 @@ public class Console extends JTextArea {
 
     public void run(String cmd) {
         if (!hasRunningProcess()) {
+            cmd = "/bin/zsh -c " + cmd;
             String[] args = cmd.split("\\s+");
             try {
                 ProcessBuilder pb = new ProcessBuilder(args);

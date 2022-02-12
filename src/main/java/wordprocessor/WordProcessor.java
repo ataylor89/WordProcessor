@@ -48,6 +48,7 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.BadLocationException;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
+import javax.swing.text.PlainDocument;
 
 public class WordProcessor extends JFrame implements ActionListener {
 
@@ -65,6 +66,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JPanel panel;
     private JScrollPane scrollPane;
     private JTextArea textArea;
+    private TabFilter tabFilter;
     private JFileChooser fileChooser;
     private File currentFile;
     private Color foregroundColor, backgroundColor;
@@ -166,7 +168,9 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
-        textArea.setTabSize(tabSize);
+        tabFilter = new TabFilter(tabSize);
+        PlainDocument pd = (PlainDocument) textArea.getDocument();
+        pd.setDocumentFilter(tabFilter);
         scrollPane = new JScrollPane(textArea);
         panel.add(scrollPane);
         add(panel);
@@ -405,7 +409,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             refreshColors();
         } else if (e.getSource() == setTabSize) {
             tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, tabSize);
-            textArea.setTabSize(tabSize);
+            tabFilter.setTabSize(tabSize);
         } else if (e.getSource() == lineCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
         } else if (e.getSource() == characterCount) {

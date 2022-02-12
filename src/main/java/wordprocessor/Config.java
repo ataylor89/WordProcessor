@@ -34,7 +34,7 @@ public class Config {
         defaultProps.put("PREFIX", "%");
         defaultProps.put("EMAIL_SENDER", "");
         defaultProps.put("EMAIL_RECIPIENT", "");
-        defaultProps.put("TAB_SIZE", "3");
+        defaultProps.put("TAB_SIZE", "4");
         return defaultProps;
     }
  
