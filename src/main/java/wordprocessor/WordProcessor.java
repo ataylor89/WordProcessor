@@ -48,6 +48,9 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.BadLocationException;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.text.PlainDocument;
 
 public class WordProcessor extends JFrame implements ActionListener {
@@ -194,9 +197,26 @@ public class WordProcessor extends JFrame implements ActionListener {
     }
 
     public void setupKeyStrokes() {
-	InputMap im = (InputMap) UIManager.get("TextArea.focusInputMap");
+        ActionMap am = textArea.getActionMap();
+        Action cmdS = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveToFile();
+            }
+        };
+        Action cmdO = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFile();
+            }
+        };
+        am.put("cmd+s", cmdS);
+        am.put("cmd+o", cmdO);
+        InputMap im = textArea.getInputMap();
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "cmd+s");
+	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
 
     public void setLookAndFeel() {
@@ -232,6 +252,13 @@ public class WordProcessor extends JFrame implements ActionListener {
         refreshMenuItems();
     }
 
+    private void saveToFile() {
+        if (currentFile == null)
+            saveToFileAs();
+        else
+            saveToFile(currentFile);
+    }
+    
     private void saveToFile(File file) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             String text = textArea.getText();
@@ -437,8 +464,8 @@ public class WordProcessor extends JFrame implements ActionListener {
         WordProcessor wordProcessor = new WordProcessor();
         wordProcessor.loadSettings();
         wordProcessor.setLookAndFeel();
-        wordProcessor.setupKeyStrokes();
         wordProcessor.createAndShowGui();
+        wordProcessor.setupKeyStrokes();
         wordProcessor.setVisible(true);
         if (args.length > 0)
             wordProcessor.openFile(new File(args[0]));
