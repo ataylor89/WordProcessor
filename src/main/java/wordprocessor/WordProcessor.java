@@ -27,16 +27,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.swing.InputMap;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -46,8 +38,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.BadLocationException;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -62,10 +52,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu tools;
     private JMenuItem setTabSize, lineCount, characterCount, gotoLine, copyToClipboard;
-    private JMenu email;
-    private JMenuItem sendEmail;
-    private JMenu run;
-    private JMenuItem runJavaProgram, runPythonProgram;
     private JPanel panel;
     private JScrollPane scrollPane;
     private JTextArea textArea;
@@ -74,8 +60,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private File currentFile;
     private Color foregroundColor, backgroundColor;
     private JDialog consoleDialog;
-    private Console console;
-    private EmailForm emailForm;
     private Config config;
     private Logger logger;
     private int tabSize;
@@ -150,22 +134,9 @@ public class WordProcessor extends JFrame implements ActionListener {
         tools.add(characterCount);
         tools.add(gotoLine);
         tools.add(copyToClipboard);
-        email = new JMenu("Email");
-        sendEmail = new JMenuItem("Send email");
-        sendEmail.addActionListener(this);
-        email.add(sendEmail);
-        run = new JMenu("Run");
-        runJavaProgram = new JMenuItem("Run Java program");
-        runJavaProgram.addActionListener(this);
-        runPythonProgram = new JMenuItem("Run Python program");
-        runPythonProgram.addActionListener(this);
-        run.add(runJavaProgram);
-        run.add(runPythonProgram);
         bar.add(file);
         bar.add(colors);
         bar.add(tools);
-        bar.add(email);
-        bar.add(run);
         setJMenuBar(bar);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -178,12 +149,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.add(scrollPane);
         add(panel);
         fileChooser = new JFileChooser();
-        console = new Console(config);
-        JScrollPane sp = new JScrollPane(console);
-        consoleDialog = new JDialog(this, "Console");
-        consoleDialog.setSize(600, 500);
-        consoleDialog.add(sp);
-        emailForm = new EmailForm(config);
         refreshColors();
         refreshMenuItems();
     }
@@ -319,52 +284,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             logger.warning(ex.toString());
         }
     }
-
-    private void sendEmail() {
-        String[] options = new String[]{"Cancel", "Send"};
-        int option = JOptionPane.showOptionDialog(null, emailForm, "Compose an email", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[1]);
-        if (option == 1)
-            sendEmail(emailForm.getTo(), 
-                    emailForm.getFrom(), 
-                    emailForm.getSubject(), 
-                    textArea.getText(), 
-                    emailForm.getFrom(), 
-                    emailForm.getPassword());
-        emailForm.reset();
-    }
-    
-    private void sendEmail(String to, String from, String subject, String body, String username, String password) {
-        Properties prop = new Properties();
-        prop.put("mail.smtp.host", "smtp.gmail.com");
-        prop.put("mail.smtp.port", "587");
-        prop.put("mail.smtp.starttls.enable", "true");
-        prop.put("mail.smtp.auth", "true");
-        Session session = Session.getInstance(prop, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(username, password);
-            }
-        });
-        session.setDebug(true);
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject(subject);
-            message.setText(body);
-            Transport.send(message);
-        } catch (AddressException e) {
-            logger.warning(e.toString());
-        } catch (MessagingException e) {
-            logger.warning(e.toString());
-        }
-    }
-    
+        
     private void refreshMenuItems() {
         save.setEnabled(currentFile != null);
-        sendEmail.setEnabled(currentFile != null);
-        runJavaProgram.setEnabled(currentFile != null);
-        runPythonProgram.setEnabled(currentFile != null);
     }
 
     private void refreshColors() {
@@ -447,17 +369,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             StringSelection stringSelection = new StringSelection(textArea.getText());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(stringSelection, null);
-        } else if (e.getSource() == sendEmail) {
-            sendEmail();
-        } else if (e.getSource() == runJavaProgram) {
-            String cmd = "java " + currentFile.getPath();
-            consoleDialog.setVisible(true);
-            console.run(cmd);
-        } else if (e.getSource() == runPythonProgram) {
-	    String cmd = "python " + currentFile.getPath();
-            consoleDialog.setVisible(true);
-            console.run(cmd);           
-        } 
+        }
     }
     
     public static void main(String[] args) {
