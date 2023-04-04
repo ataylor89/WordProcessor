@@ -28,7 +28,6 @@ public class Config {
     
     public Properties getDefaults() {
         Properties defaultProps = new Properties();
-        defaultProps.put("PATH", "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin");
         defaultProps.put("FGCOLOR", "rgba(0,0,0,255)");
         defaultProps.put("BGCOLOR", "rgba(255,255,255,255)");
         defaultProps.put("TAB_SIZE", "4");
@@ -47,14 +46,6 @@ public class Config {
         } catch (IOException ex) {
             logger.warning(ex.toString());
         }
-    }
-    
-    public String getPath() {
-        return properties.getProperty("PATH");
-    }
-    
-    public String[] getPaths() {
-        return getPath().split(":");
     }
     
     public Color getForegroundColor() {
