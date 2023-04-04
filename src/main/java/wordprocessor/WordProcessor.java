@@ -56,7 +56,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private TabFilter tabFilter;
     private Config config;
     private Logger logger;
-    private int tabSize;
     
     public WordProcessor() {
         super("Word Processor");
@@ -74,7 +73,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         }
         config = new Config();
         config.loadConfig();
-        tabSize = config.getTabSize();
         logger.info("Loaded settings");
     }
     
@@ -144,7 +142,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
-        tabFilter = new TabFilter(tabSize);
+        tabFilter = new TabFilter(config.getTabSize());
         PlainDocument pd = (PlainDocument) textArea.getDocument();
         pd.setDocumentFilter(tabFilter);
         scrollPane = new JScrollPane(textArea);
@@ -311,7 +309,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             textArea.setForeground(Color.WHITE);
             textArea.setBackground(new Color(0, 153, 255, 255));
         } else if (e.getSource() == setTabSize) {
-            tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, tabSize);
+            int tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabFilter.getTabSizes(), tabFilter.getTabSize());
             tabFilter.setTabSize(tabSize);
         } else if (e.getSource() == lineCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");

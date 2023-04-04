@@ -10,13 +10,10 @@ import javax.swing.text.DocumentFilter;
  */
 public class TabFilter extends DocumentFilter {
     private int tabSize;
-    private String spaces = "";
+    private String spaces;
 
     public TabFilter(int tabSize) {
-        this.tabSize = tabSize;
-        for (int i = 0; i < tabSize; i++) {
-            spaces += " ";
-        }
+        this.setTabSize(tabSize);
     }
 
     @Override
@@ -36,14 +33,19 @@ public class TabFilter extends DocumentFilter {
         super.replace(fb, offset, length, text, attrs);
     }
     
-    public void setTabSize(int tabSize) {
+    public final void setTabSize(int tabSize) {
         this.tabSize = tabSize;
+        spaces = "";
         for (int i = 0; i < tabSize; i++) {
             spaces += " ";
         }
     }
 
-    public int getTabSize() {
+    public final int getTabSize() {
         return tabSize;
+    }
+    
+    public Integer[] getTabSizes() {
+        return new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
     }
 }
