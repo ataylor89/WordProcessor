@@ -15,14 +15,14 @@ import java.util.regex.Pattern;
  */
 public class Config {
     private Properties properties;
-    private Logger logger;
     private Pattern colorPattern;
     private Color foregroundColor;
     private Color backgroundColor;
+    private Logger logger;
     private int tabSize;
     
     public Config() {
-        logger = AppLogger.getLogger();
+        logger = Logger.getLogger("WordProcessor");
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
     }
     

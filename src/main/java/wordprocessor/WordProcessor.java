@@ -5,8 +5,9 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -15,16 +16,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.util.logging.Logger;
 import javax.swing.InputMap;
 import javax.swing.JColorChooser;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -35,6 +28,16 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.text.PlainDocument;
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 public class WordProcessor extends JFrame implements ActionListener {
 
@@ -52,15 +55,30 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JFileChooser fileChooser;
     private File currentFile;
     private Color foregroundColor, backgroundColor;
-    private JDialog consoleDialog;
     private Config config;
     private Logger logger;
     private int tabSize;
     
     public WordProcessor() {
         super("Word Processor");
-        logger = AppLogger.getLogger();
+    }
+    
+    public void init() {
+        logger = Logger.getLogger("WordProcessor");
+        logger.setLevel(Level.ALL);
+        logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+        try {
+            logger.addHandler(new FileHandler("WordProcessor.log", true));
+            logger.info("Set up file logging");
+        } catch (IOException e) {
+            logger.warning(e.toString());
+        }
         config = new Config();
+        logger.info("Loading settings");
+        config.loadConfig();
+        foregroundColor = config.getForegroundColor();
+        backgroundColor = config.getBackgroundColor();
+        tabSize = config.getTabSize();
     }
     
     public void createAndShowGui() {
@@ -143,14 +161,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         refreshMenuItems();
     }
     
-    public void loadSettings() {
-        logger.info("Loading settings");
-        config.loadConfig();
-        foregroundColor = config.getForegroundColor();
-        backgroundColor = config.getBackgroundColor();
-        tabSize = config.getTabSize();
-    }
-
     public void setupKeyStrokes() {
         ActionMap am = textArea.getActionMap();
         Action cmdS = new AbstractAction() {
@@ -339,7 +349,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     
     public static void main(String[] args) {
         WordProcessor wordProcessor = new WordProcessor();
-        wordProcessor.loadSettings();
+        wordProcessor.init();
         wordProcessor.setLookAndFeel();
         wordProcessor.createAndShowGui();
         wordProcessor.setupKeyStrokes();
