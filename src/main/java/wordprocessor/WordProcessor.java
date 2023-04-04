@@ -5,10 +5,8 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -22,13 +20,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.InputMap;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -47,7 +40,7 @@ public class WordProcessor extends JFrame implements ActionListener {
 
     private JMenuBar bar;
     private JMenu file;
-    private JMenuItem newFile, save, saveAs, open, openURL, exit;
+    private JMenuItem newFile, save, saveAs, open, exit;
     private JMenu colors;
     private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu tools;
@@ -83,15 +76,12 @@ public class WordProcessor extends JFrame implements ActionListener {
         saveAs.addActionListener(this);
         open = new JMenuItem("Open");
         open.addActionListener(this);
-        openURL = new JMenuItem("Open URL");
-        openURL.addActionListener(this);
         exit = new JMenuItem("Exit");
         exit.addActionListener(this);
         file.add(newFile);
         file.add(save);
         file.add(saveAs);
         file.add(open);
-        file.add(openURL);
         file.add(exit);
         colors = new JMenu("Colors");
         fgcolor = new JMenuItem("Set foreground color");
@@ -262,29 +252,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             openFile(f);
         }
     }
-    
-    private void openURL() {
-        String address = JOptionPane.showInputDialog(this, "URL:", "Open URL", JOptionPane.QUESTION_MESSAGE);
-        openURL(address);
-    }
-    
-    private void openURL(String address) {
-        try {
-            URL url = new URL(address);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-            BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) connection.getContent()));
-            String text = br.lines().collect(Collectors.joining("\n"));
-            textArea.setText(text);
-            refreshMenuItems();
-            currentFile = null;
-        } catch (MalformedURLException ex) {
-            logger.warning(ex.toString());
-        } catch (IOException ex) {
-            logger.warning(ex.toString());
-        }
-    }
-        
+            
     private void refreshMenuItems() {
         save.setEnabled(currentFile != null);
     }
@@ -316,9 +284,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         } else if (e.getSource() == open) {
             promptForSave();
             openFile();
-        } else if (e.getSource() == openURL) {
-            promptForSave();
-            openURL();
         } else if (e.getSource() == exit) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);
