@@ -45,16 +45,15 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JMenu file;
     private JMenuItem newFile, save, saveAs, open, exit;
     private JMenu colors;
-    private JMenuItem fgcolor, bgcolor, whiteblack, whitegray, grayblue, tealwhite, purplewhite, seaTheme;
+    private JMenuItem fgcolor, bgcolor, whiteblack, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu tools;
     private JMenuItem setTabSize, lineCount, characterCount, gotoLine, copyToClipboard;
     private JPanel panel;
     private JScrollPane scrollPane;
     private JTextArea textArea;
-    private TabFilter tabFilter;
     private JFileChooser fileChooser;
     private File currentFile;
-    private Color foregroundColor, backgroundColor;
+    private TabFilter tabFilter;
     private Config config;
     private Logger logger;
     private int tabSize;
@@ -74,11 +73,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             logger.warning(e.toString());
         }
         config = new Config();
-        logger.info("Loading settings");
         config.loadConfig();
-        foregroundColor = config.getForegroundColor();
-        backgroundColor = config.getBackgroundColor();
         tabSize = config.getTabSize();
+        logger.info("Loaded settings");
     }
     
     public void createAndShowGui() {
@@ -108,8 +105,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         bgcolor.addActionListener(this);
         whiteblack = new JMenuItem("White black");
         whiteblack.addActionListener(this);
-        whitegray = new JMenuItem("White gray");
-        whitegray.addActionListener(this);
         grayblue = new JMenuItem("Gray blue");
         grayblue.addActionListener(this);
         tealwhite = new JMenuItem("Teal white");
@@ -121,7 +116,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         colors.add(fgcolor);
         colors.add(bgcolor);
         colors.add(whiteblack);
-        colors.add(whitegray);
         colors.add(grayblue);
         colors.add(tealwhite);
         colors.add(purplewhite);
@@ -157,7 +151,8 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.add(scrollPane);
         add(panel);
         fileChooser = new JFileChooser();
-        refreshColors();
+        textArea.setForeground(config.getForegroundColor());
+        textArea.setBackground(config.getBackgroundColor());
         refreshMenuItems();
     }
     
@@ -266,11 +261,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private void refreshMenuItems() {
         save.setEnabled(currentFile != null);
     }
-
-    private void refreshColors() {
-        textArea.setForeground(foregroundColor);
-        textArea.setBackground(backgroundColor);
-    }
     
     private void promptForLineNumber() {
         int lineNumber = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter a line number:", "Goto line", JOptionPane.QUESTION_MESSAGE));
@@ -298,39 +288,28 @@ public class WordProcessor extends JFrame implements ActionListener {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);
         } else if (e.getSource() == fgcolor) {
-            Color color = JColorChooser.showDialog(this, "Select a foreground color", foregroundColor);
+            Color color = JColorChooser.showDialog(this, "Select a foreground color", textArea.getForeground());
             if (color != null) 
-                foregroundColor = color;
-            textArea.setForeground(foregroundColor);
+                textArea.setForeground(color);
         } else if (e.getSource() == bgcolor) {
-            Color color = JColorChooser.showDialog(this, "Select a background color", backgroundColor);
+            Color color = JColorChooser.showDialog(this, "Select a background color", textArea.getBackground());
             if (color != null) 
-                backgroundColor = color;
-            textArea.setBackground(backgroundColor);
+                textArea.setBackground(color);
         } else if (e.getSource() == whiteblack) {
-            foregroundColor = Color.BLACK;
-            backgroundColor = Color.WHITE;
-            refreshColors();
-        } else if (e.getSource() == whitegray) {
-            foregroundColor = Color.LIGHT_GRAY;
-            backgroundColor = Color.WHITE;
-            refreshColors();
+            textArea.setForeground(Color.BLACK);
+            textArea.setBackground(Color.WHITE);
         } else if (e.getSource() == grayblue) {
-            foregroundColor = new Color(0, 0, 204, 255);
-            backgroundColor = new Color(204, 204, 204, 255);
-            refreshColors();
+            textArea.setForeground(new Color(0, 0, 204, 255));
+            textArea.setBackground(new Color(204, 204, 204, 255));
         } else if (e.getSource() == tealwhite) {
-            foregroundColor = Color.WHITE;
-            backgroundColor = new Color(0, 153, 153, 255);
-            refreshColors();
+            textArea.setForeground(Color.WHITE);
+            textArea.setBackground(new Color(0, 153, 153, 255));
         } else if (e.getSource() == purplewhite) {
-            foregroundColor = Color.WHITE;
-            backgroundColor = new Color(153, 0, 153, 255);
-            refreshColors();
+            textArea.setForeground(Color.WHITE);
+            textArea.setBackground(new Color(153, 0, 153, 255));
         } else if (e.getSource() == seaTheme) {
-            foregroundColor = Color.WHITE;
-            backgroundColor = new Color(0, 153, 255, 255);
-            refreshColors();
+            textArea.setForeground(Color.WHITE);
+            textArea.setBackground(new Color(0, 153, 255, 255));
         } else if (e.getSource() == setTabSize) {
             tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, tabSize);
             tabFilter.setTabSize(tabSize);
