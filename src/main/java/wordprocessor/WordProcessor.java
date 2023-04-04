@@ -229,7 +229,6 @@ public class WordProcessor extends JFrame implements ActionListener {
 
     private void saveToFileAs() {
         int option = fileChooser.showSaveDialog(this);
-
         if (option == JFileChooser.APPROVE_OPTION) {
             currentFile = fileChooser.getSelectedFile();
             saveToFile(currentFile);
@@ -249,7 +248,6 @@ public class WordProcessor extends JFrame implements ActionListener {
 
     private void openFile() {
         int option = fileChooser.showOpenDialog(this);
-
         if (option == JFileChooser.APPROVE_OPTION) {
             File f = fileChooser.getSelectedFile();
             openFile(f);

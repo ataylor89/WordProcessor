@@ -14,12 +14,13 @@ import java.util.regex.Pattern;
  * @author andrewtaylor
  */
 public class Config {
+    
     private Properties properties;
     private Pattern colorPattern;
     private Color foregroundColor;
     private Color backgroundColor;
-    private Logger logger;
     private int tabSize;
+    private Logger logger;
     
     public Config() {
         logger = Logger.getLogger("WordProcessor");
@@ -51,7 +52,6 @@ public class Config {
     public Color getForegroundColor() {
         if (foregroundColor == null) {
             String fgcolor = properties.getProperty("FGCOLOR");
-
             Matcher matcher = colorPattern.matcher(fgcolor);
             if (matcher.matches()) {
                 int[] rgba = new int[4];
@@ -70,7 +70,6 @@ public class Config {
     public Color getBackgroundColor() {
         if (backgroundColor == null) {
             String bgcolor = properties.getProperty("BGCOLOR");   
-
             Matcher matcher = colorPattern.matcher(bgcolor);
             if (matcher.matches()) {
                 int[] rgba = new int[4];
