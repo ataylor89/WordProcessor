@@ -23,7 +23,6 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.BadLocationException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -32,13 +31,10 @@ import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.nio.file.Files;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
-public class WordProcessor extends JFrame implements ActionListener {
+public class WordProcessor extends JFrame implements ActionListener, MenuListener {
 
     private JMenuBar bar;
     private JMenu file;
@@ -46,39 +42,34 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JMenu colors;
     private JMenuItem fgcolor, bgcolor, whiteblack, grayblue, tealwhite, purplewhite, seaTheme;
     private JMenu tools;
-    private JMenuItem setTabSize, lineCount, characterCount, gotoLine, copyToClipboard;
-    private JPanel panel;
+    private JMenuItem setTabSize, lineCount, characterCount, copyToClipboard;
+    private JPanel contentPane;
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JFileChooser fileChooser;
     private File currentFile;
     private Config config;
-    private Logger logger;
     
     public WordProcessor() {
         super("Word Processor");
-    }
-    
-    public void init() {
-        logger = Logger.getLogger("WordProcessor");
-        logger.setLevel(Level.ALL);
-        logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
-        try {
-            logger.addHandler(new FileHandler("WordProcessor.log", true));
-            logger.info("Set up file logging");
-        } catch (IOException e) {
-            logger.warning(e.toString());
-        }
         config = new Config();
         config.loadConfig();
-        logger.info("Loaded settings");
     }
     
+    public void setLookAndFeel() {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+            System.err.println(e);
+        }
+    }
+        
     public void createAndShowGui() {
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         bar = new JMenuBar();
         file = new JMenu("File");
+        file.addMenuListener(this);
         newFile = new JMenuItem("New");
         newFile.addActionListener(this);
         save = new JMenuItem("Save");
@@ -123,31 +114,27 @@ public class WordProcessor extends JFrame implements ActionListener {
         lineCount.addActionListener(this);
         characterCount = new JMenuItem("Get character count");
         characterCount.addActionListener(this);
-        gotoLine = new JMenuItem("Goto line number");
-        gotoLine.addActionListener(this);
         copyToClipboard = new JMenuItem("Copy text to clipboard");
         copyToClipboard.addActionListener(this);
         tools.add(setTabSize);
         tools.add(lineCount);
         tools.add(characterCount);
-        tools.add(gotoLine);
         tools.add(copyToClipboard);
         bar.add(file);
         bar.add(colors);
         bar.add(tools);
         setJMenuBar(bar);
-        panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        contentPane = new JPanel();
+        contentPane.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
         textArea.setTabSize(2);
-        scrollPane = new JScrollPane(textArea);
-        panel.add(scrollPane);
-        add(panel);
-        fileChooser = new JFileChooser();
         textArea.setForeground(config.getForegroundColor());
         textArea.setBackground(config.getBackgroundColor());
-        refreshMenuItems();      
+        scrollPane = new JScrollPane(textArea);
+        contentPane.add(scrollPane);
+        setContentPane(contentPane);
+        fileChooser = new JFileChooser();  
     }
     
     public void setupKeyStrokes() {
@@ -173,21 +160,13 @@ public class WordProcessor extends JFrame implements ActionListener {
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
 
-    public void setLookAndFeel() {
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-            logger.warning(e.toString());
-        }
-    }
-
     private boolean isSaved() {
         try {
             String fileContents = Files.readString(currentFile.toPath());
             if (textArea.getText().equals(fileContents))
                 return true;
         } catch (IOException e) {
-            logger.warning(e.toString());
+            System.err.println(e);
         }
         return false;
     }
@@ -203,7 +182,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private void newFile() {
         currentFile = null;
         textArea.setText("");
-        refreshMenuItems();
     }
 
     private void saveToFile() {
@@ -217,9 +195,8 @@ public class WordProcessor extends JFrame implements ActionListener {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             String text = textArea.getText();
             bufferedWriter.write(text);
-            refreshMenuItems();
-        } catch (IOException ex) {
-            logger.warning(ex.toString());
+        } catch (IOException e) {
+            System.err.println(e);
         } 
     }
 
@@ -236,9 +213,8 @@ public class WordProcessor extends JFrame implements ActionListener {
             String text = Files.readString(file.toPath());
             textArea.setText(text);
             currentFile = file;
-            refreshMenuItems();
         } catch (IOException e) {
-            logger.warning(e.toString());
+            System.err.println(e);
         }
     }
 
@@ -247,20 +223,6 @@ public class WordProcessor extends JFrame implements ActionListener {
         if (option == JFileChooser.APPROVE_OPTION) {
             File f = fileChooser.getSelectedFile();
             openFile(f);
-        }
-    }
-            
-    private void refreshMenuItems() {
-        save.setEnabled(currentFile != null);
-    }
-    
-    private void promptForLineNumber() {
-        int lineNumber = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter a line number:", "Goto line", JOptionPane.QUESTION_MESSAGE));
-        try {
-            textArea.setCaretPosition(textArea.getLineStartOffset(lineNumber));
-        } catch (BadLocationException ex) {
-            logger.warning(ex.toString());
-            textArea.setCaretPosition(textArea.getText().length());
         }
     }
    
@@ -310,8 +272,6 @@ public class WordProcessor extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
         } else if (e.getSource() == characterCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getText().length() + " characters in the file");
-        } else if (e.getSource() == gotoLine) {
-            promptForLineNumber();
         } else if (e.getSource() == copyToClipboard) {
             StringSelection stringSelection = new StringSelection(textArea.getText());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -319,9 +279,24 @@ public class WordProcessor extends JFrame implements ActionListener {
         }
     }
     
+    @Override
+    public void menuSelected(MenuEvent e) {
+        if (currentFile == null) {
+            save.setEnabled(false);
+        }
+        else {
+            save.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void menuDeselected(MenuEvent e) {}
+
+    @Override
+    public void menuCanceled(MenuEvent e) {}
+    
     public static void main(String[] args) {
         WordProcessor wordProcessor = new WordProcessor();
-        wordProcessor.init();
         wordProcessor.setLookAndFeel();
         wordProcessor.createAndShowGui();
         wordProcessor.setupKeyStrokes();
