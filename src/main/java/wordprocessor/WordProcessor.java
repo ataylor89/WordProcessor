@@ -1,4 +1,5 @@
 package wordprocessor;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -37,17 +38,17 @@ import javax.swing.event.MenuListener;
 public class WordProcessor extends JFrame implements ActionListener, MenuListener {
 
     private JMenuBar bar;
-    private JMenu file;
-    private JMenuItem newFile, save, saveAs, open, exit;
-    private JMenu colors;
+    private JMenu fileMenu;
+    private JMenuItem newFile, saveFile, saveFileAs, openFile, exit;
+    private JMenu colorsMenu;
     private JMenuItem fgcolor, bgcolor, whiteblack, grayblue, tealwhite, purplewhite, seaTheme;
-    private JMenu tools;
+    private JMenu toolsMenu;
     private JMenuItem setTabSize, lineCount, characterCount, copyToClipboard;
     private JPanel contentPane;
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JFileChooser fileChooser;
-    private File currentFile;
+    private File file;
     private Config config;
     
     public WordProcessor() {
@@ -68,24 +69,24 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         bar = new JMenuBar();
-        file = new JMenu("File");
-        file.addMenuListener(this);
+        fileMenu = new JMenu("File");
+        fileMenu.addMenuListener(this);
         newFile = new JMenuItem("New");
         newFile.addActionListener(this);
-        save = new JMenuItem("Save");
-        save.addActionListener(this);
-        saveAs = new JMenuItem("Save as");
-        saveAs.addActionListener(this);
-        open = new JMenuItem("Open");
-        open.addActionListener(this);
+        saveFile = new JMenuItem("Save");
+        saveFile.addActionListener(this);
+        saveFileAs = new JMenuItem("Save as");
+        saveFileAs.addActionListener(this);
+        openFile = new JMenuItem("Open");
+        openFile.addActionListener(this);
         exit = new JMenuItem("Exit");
         exit.addActionListener(this);
-        file.add(newFile);
-        file.add(save);
-        file.add(saveAs);
-        file.add(open);
-        file.add(exit);
-        colors = new JMenu("Colors");
+        fileMenu.add(newFile);
+        fileMenu.add(saveFile);
+        fileMenu.add(saveFileAs);
+        fileMenu.add(openFile);
+        fileMenu.add(exit);
+        colorsMenu = new JMenu("Colors");
         fgcolor = new JMenuItem("Set foreground color");
         fgcolor.addActionListener(this);
         bgcolor = new JMenuItem("Set background color");
@@ -100,14 +101,14 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         purplewhite.addActionListener(this);
         seaTheme = new JMenuItem("Sea theme");
         seaTheme.addActionListener(this);
-        colors.add(fgcolor);
-        colors.add(bgcolor);
-        colors.add(whiteblack);
-        colors.add(grayblue);
-        colors.add(tealwhite);
-        colors.add(purplewhite);
-        colors.add(seaTheme);
-        tools = new JMenu("Tools");
+        colorsMenu.add(fgcolor);
+        colorsMenu.add(bgcolor);
+        colorsMenu.add(whiteblack);
+        colorsMenu.add(grayblue);
+        colorsMenu.add(tealwhite);
+        colorsMenu.add(purplewhite);
+        colorsMenu.add(seaTheme);
+        toolsMenu = new JMenu("Tools");
         setTabSize = new JMenuItem("Set tab size");
         setTabSize.addActionListener(this);
         lineCount = new JMenuItem("Get line count");
@@ -116,13 +117,13 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         characterCount.addActionListener(this);
         copyToClipboard = new JMenuItem("Copy text to clipboard");
         copyToClipboard.addActionListener(this);
-        tools.add(setTabSize);
-        tools.add(lineCount);
-        tools.add(characterCount);
-        tools.add(copyToClipboard);
-        bar.add(file);
-        bar.add(colors);
-        bar.add(tools);
+        toolsMenu.add(setTabSize);
+        toolsMenu.add(lineCount);
+        toolsMenu.add(characterCount);
+        toolsMenu.add(copyToClipboard);
+        bar.add(fileMenu);
+        bar.add(colorsMenu);
+        bar.add(toolsMenu);
         setJMenuBar(bar);
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
@@ -162,9 +163,10 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
 
     private boolean isSaved() {
         try {
-            String fileContents = Files.readString(currentFile.toPath());
-            if (textArea.getText().equals(fileContents))
+            String fileContents = Files.readString(file.toPath());
+            if (textArea.getText().equals(fileContents)) {
                 return true;
+            }
         } catch (IOException e) {
             System.err.println(e);
         }
@@ -172,26 +174,19 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     }
     
     private void promptForSave() {
-        if (currentFile != null && !isSaved()) {
-            int option = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
-            if (option == JOptionPane.YES_OPTION) 
-                saveToFile(currentFile);
+        if (file != null && !isSaved()) {
+            if (JOptionPane.showConfirmDialog(this, "Would you like to save the current file?") == JOptionPane.YES_OPTION) {
+                saveToFile();
+            }
         }
     }
 
     private void newFile() {
-        currentFile = null;
+        file = null;
         textArea.setText("");
     }
-
-    private void saveToFile() {
-        if (currentFile == null)
-            saveToFileAs();
-        else
-            saveToFile(currentFile);
-    }
     
-    private void saveToFile(File file) {
+    private void saveToFile() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             String text = textArea.getText();
             bufferedWriter.write(text);
@@ -201,10 +196,9 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     }
 
     private void saveToFileAs() {
-        int option = fileChooser.showSaveDialog(this);
-        if (option == JFileChooser.APPROVE_OPTION) {
-            currentFile = fileChooser.getSelectedFile();
-            saveToFile(currentFile);
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            this.file = fileChooser.getSelectedFile();
+            saveToFile();
         }
     }
 
@@ -212,17 +206,15 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         try {
             String text = Files.readString(file.toPath());
             textArea.setText(text);
-            currentFile = file;
+            this.file = file;
         } catch (IOException e) {
             System.err.println(e);
         }
     }
 
     private void openFile() {
-        int option = fileChooser.showOpenDialog(this);
-        if (option == JFileChooser.APPROVE_OPTION) {
-            File f = fileChooser.getSelectedFile();
-            openFile(f);
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            openFile(fileChooser.getSelectedFile());
         }
     }
    
@@ -231,11 +223,11 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         if (e.getSource() == newFile) {
             promptForSave();
             newFile();
-        } else if (e.getSource() == save) {
-            saveToFile(currentFile);
-        } else if (e.getSource() == saveAs) {
+        } else if (e.getSource() == saveFile) {
+            saveToFile();
+        } else if (e.getSource() == saveFileAs) {
             saveToFileAs();
-        } else if (e.getSource() == open) {
+        } else if (e.getSource() == openFile) {
             promptForSave();
             openFile();
         } else if (e.getSource() == exit) {
@@ -281,11 +273,11 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     
     @Override
     public void menuSelected(MenuEvent e) {
-        if (currentFile == null) {
-            save.setEnabled(false);
+        if (file == null) {
+            saveFile.setEnabled(false);
         }
         else {
-            save.setEnabled(true);
+            saveFile.setEnabled(true);
         }
     }
 
