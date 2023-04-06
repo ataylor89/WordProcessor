@@ -163,20 +163,8 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     }
         
     public void newFile() {
-        int choice = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
-        switch (choice) {
-            case JOptionPane.YES_OPTION:
-                if (file == null) {
-                    saveToFileAs();
-                }
-                else {
-                    saveToFile();
-                }
-            case JOptionPane.NO_OPTION:
-                file = null;
-                textArea.setText("");
-                break;
-        }
+        file = null;
+        textArea.setText("");
     }
     
     private void saveToFile() {
@@ -206,20 +194,8 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     }
 
     private void openFile() {
-        int choice = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
-        switch (choice) {
-            case JOptionPane.YES_OPTION:
-                if (file == null) {
-                    saveToFileAs();
-                }
-                else {
-                    saveToFile();
-                }
-            case JOptionPane.NO_OPTION:
-                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                    openFile(fileChooser.getSelectedFile());
-                }
-                break;
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            openFile(fileChooser.getSelectedFile());
         }
     }
    
