@@ -27,7 +27,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.text.PlainDocument;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedWriter;
@@ -53,7 +52,6 @@ public class WordProcessor extends JFrame implements ActionListener {
     private JTextArea textArea;
     private JFileChooser fileChooser;
     private File currentFile;
-    private TabFilter tabFilter;
     private Config config;
     private Logger logger;
     
@@ -121,9 +119,9 @@ public class WordProcessor extends JFrame implements ActionListener {
         tools = new JMenu("Tools");
         setTabSize = new JMenuItem("Set tab size");
         setTabSize.addActionListener(this);
-        lineCount = new JMenuItem("Check line count");
+        lineCount = new JMenuItem("Get line count");
         lineCount.addActionListener(this);
-        characterCount = new JMenuItem("Check character count");
+        characterCount = new JMenuItem("Get character count");
         characterCount.addActionListener(this);
         gotoLine = new JMenuItem("Goto line number");
         gotoLine.addActionListener(this);
@@ -142,16 +140,14 @@ public class WordProcessor extends JFrame implements ActionListener {
         panel.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
-        tabFilter = new TabFilter(config.getTabSize());
-        PlainDocument pd = (PlainDocument) textArea.getDocument();
-        pd.setDocumentFilter(tabFilter);
+        textArea.setTabSize(2);
         scrollPane = new JScrollPane(textArea);
         panel.add(scrollPane);
         add(panel);
         fileChooser = new JFileChooser();
         textArea.setForeground(config.getForegroundColor());
         textArea.setBackground(config.getBackgroundColor());
-        refreshMenuItems();
+        refreshMenuItems();      
     }
     
     public void setupKeyStrokes() {
@@ -307,8 +303,9 @@ public class WordProcessor extends JFrame implements ActionListener {
             textArea.setForeground(Color.WHITE);
             textArea.setBackground(new Color(0, 153, 255, 255));
         } else if (e.getSource() == setTabSize) {
-            int tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabFilter.getTabSizes(), tabFilter.getTabSize());
-            tabFilter.setTabSize(tabSize);
+            Integer[] tabSizes = new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+            int tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabSizes, textArea.getTabSize());
+            textArea.setTabSize(tabSize);
         } else if (e.getSource() == lineCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
         } else if (e.getSource() == characterCount) {
@@ -329,7 +326,5 @@ public class WordProcessor extends JFrame implements ActionListener {
         wordProcessor.createAndShowGui();
         wordProcessor.setupKeyStrokes();
         wordProcessor.setVisible(true);
-        if (args.length > 0)
-            wordProcessor.openFile(new File(args[0]));
     }
 }
