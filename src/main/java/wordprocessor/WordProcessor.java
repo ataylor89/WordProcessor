@@ -54,7 +54,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     public WordProcessor() {
         super("Word Processor");
         config = new Config();
-        config.loadConfig();
+        config.load();
     }
     
     public void setLookAndFeel() {
