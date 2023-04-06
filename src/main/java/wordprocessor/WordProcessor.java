@@ -135,7 +135,8 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         scrollPane = new JScrollPane(textArea);
         contentPane.add(scrollPane);
         setContentPane(contentPane);
-        fileChooser = new JFileChooser();  
+        fileChooser = new JFileChooser();
+        setupKeyStrokes();
     }
     
     public void setupKeyStrokes() {
@@ -160,30 +161,22 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "cmd+s");
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
-
-    private boolean isSaved() {
-        try {
-            String fileContents = Files.readString(file.toPath());
-            if (textArea.getText().equals(fileContents)) {
-                return true;
-            }
-        } catch (IOException e) {
-            System.err.println(e);
+        
+    public void newFile() {
+        int choice = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
+        switch (choice) {
+            case JOptionPane.YES_OPTION:
+                if (file == null) {
+                    saveToFileAs();
+                }
+                else {
+                    saveToFile();
+                }
+            case JOptionPane.NO_OPTION:
+                file = null;
+                textArea.setText("");
+                break;
         }
-        return false;
-    }
-    
-    private void promptForSave() {
-        if (file != null && !isSaved()) {
-            if (JOptionPane.showConfirmDialog(this, "Would you like to save the current file?") == JOptionPane.YES_OPTION) {
-                saveToFile();
-            }
-        }
-    }
-
-    private void newFile() {
-        file = null;
-        textArea.setText("");
     }
     
     private void saveToFile() {
@@ -213,34 +206,46 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     }
 
     private void openFile() {
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            openFile(fileChooser.getSelectedFile());
+        int choice = JOptionPane.showConfirmDialog(this, "Would you like to save the current file?");
+        switch (choice) {
+            case JOptionPane.YES_OPTION:
+                if (file == null) {
+                    saveToFileAs();
+                }
+                else {
+                    saveToFile();
+                }
+            case JOptionPane.NO_OPTION:
+                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    openFile(fileChooser.getSelectedFile());
+                }
+                break;
         }
     }
    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == newFile) {
-            promptForSave();
             newFile();
         } else if (e.getSource() == saveFile) {
             saveToFile();
         } else if (e.getSource() == saveFileAs) {
             saveToFileAs();
         } else if (e.getSource() == openFile) {
-            promptForSave();
             openFile();
         } else if (e.getSource() == exit) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);
         } else if (e.getSource() == fgcolor) {
             Color color = JColorChooser.showDialog(this, "Select a foreground color", textArea.getForeground());
-            if (color != null) 
+            if (color != null) {
                 textArea.setForeground(color);
+            }
         } else if (e.getSource() == bgcolor) {
             Color color = JColorChooser.showDialog(this, "Select a background color", textArea.getBackground());
-            if (color != null) 
+            if (color != null) { 
                 textArea.setBackground(color);
+            }
         } else if (e.getSource() == whiteblack) {
             textArea.setForeground(Color.BLACK);
             textArea.setBackground(Color.WHITE);
@@ -258,8 +263,10 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
             textArea.setBackground(new Color(0, 153, 255, 255));
         } else if (e.getSource() == setTabSize) {
             Integer[] tabSizes = new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-            int tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabSizes, textArea.getTabSize());
-            textArea.setTabSize(tabSize);
+            Integer tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabSizes, textArea.getTabSize());
+            if (tabSize != null) {
+                textArea.setTabSize(tabSize);
+            }
         } else if (e.getSource() == lineCount) {
             JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
         } else if (e.getSource() == characterCount) {
@@ -291,7 +298,6 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         WordProcessor wordProcessor = new WordProcessor();
         wordProcessor.setLookAndFeel();
         wordProcessor.createAndShowGui();
-        wordProcessor.setupKeyStrokes();
         wordProcessor.setVisible(true);
     }
 }
