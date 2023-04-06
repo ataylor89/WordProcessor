@@ -27,13 +27,13 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.nio.file.Files;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 public class WordProcessor extends JFrame implements ActionListener, MenuListener {
 
