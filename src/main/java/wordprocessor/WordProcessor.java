@@ -183,19 +183,15 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         }
     }
 
-    private void openFile(File file) {
-        try {
-            String text = Files.readString(file.toPath());
-            textArea.setText(text);
-            this.file = file;
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-    }
-
     private void openFile() {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            openFile(fileChooser.getSelectedFile());
+            this.file = fileChooser.getSelectedFile();
+            try {
+                String text = Files.readString(file.toPath());
+                textArea.setText(text);
+            } catch (IOException e) {
+                System.err.println(e);
+            }
         }
     }
    
