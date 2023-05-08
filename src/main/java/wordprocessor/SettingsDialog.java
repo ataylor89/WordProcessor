@@ -30,7 +30,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
     
     public SettingsDialog(Frame frame) {
         super(frame, true);
-        settings = Settings.getInstance(null);
+        settings = Settings.getInstance();
         init();
     }
     

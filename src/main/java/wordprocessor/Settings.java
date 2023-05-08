@@ -17,21 +17,32 @@ import javax.swing.JTextArea;
 public class Settings {
     
     private static Settings instance;
-    private final WordProcessor wp;
+    private WordProcessor wp;
     private Font font;
     private Color foreground;
     private Color background;
     private int tabSize;
     private final Pattern fontPattern, colorPattern;
     
-    private Settings(WordProcessor wp) {
-        this.wp = wp;
+    private Settings() {
         font = new Font("SansSerif", Font.PLAIN, 12);
         foreground = Color.BLACK;
         background = Color.WHITE;
         tabSize = 4;
         fontPattern = Pattern.compile("([a-zA-Z1-9 ]+),(\\d+)");
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
+    }
+    
+    private Settings(WordProcessor wp) {
+        this();
+        this.wp = wp;
+    }
+    
+    public static Settings getInstance() {
+        if (instance == null) {
+            instance = new Settings();
+        }
+        return instance;
     }
     
     public static Settings getInstance(WordProcessor wp) {
@@ -129,6 +140,14 @@ public class Settings {
     
     public int getTabSize() {
         return tabSize;
+    }
+    
+    public void setGui(WordProcessor wp) {
+        this.wp = wp;
+    }
+    
+    public WordProcessor getGui() {
+        return wp;
     }
     
     public void apply() {

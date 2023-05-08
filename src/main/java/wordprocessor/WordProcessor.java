@@ -89,9 +89,10 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         setContentPane(contentPane);
         fileChooser = new JFileChooser();
         setupKeyListener();
-        settingsDialog = new SettingsDialog(this);
-        Settings settings = Settings.getInstance(null);
+        Settings settings = Settings.getInstance(this);
+        settings.load();
         settings.apply();
+        settingsDialog = new SettingsDialog(this);
         setVisible(true);
     }
     
@@ -191,8 +192,6 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
                 
     public static void main(String[] args) {
         WordProcessor wp = new WordProcessor();
-        Settings settings = Settings.getInstance(wp);
-        settings.load();
         wp.createAndShowGui();
     }
 }
