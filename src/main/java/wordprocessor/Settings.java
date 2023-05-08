@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -16,13 +17,15 @@ import java.util.regex.Pattern;
 public class Settings {
     
     private static Settings instance;
+    private final WordProcessor wp;
     private Font font;
     private Color foreground;
     private Color background;
     private int tabSize;
     private final Pattern fontPattern, colorPattern;
     
-    private Settings() {
+    private Settings(WordProcessor wp) {
+        this.wp = wp;
         font = new Font("SansSerif", Font.PLAIN, 12);
         foreground = Color.BLACK;
         background = Color.WHITE;
@@ -31,9 +34,9 @@ public class Settings {
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
     }
     
-    public static Settings getInstance() {
+    public static Settings getInstance(WordProcessor wp) {
         if (instance == null) {
-            instance = new Settings();
+            instance = new Settings(wp);
         }
         return instance;
     }
@@ -113,5 +116,13 @@ public class Settings {
     
     public int getTabSize() {
         return tabSize;
+    }
+    
+    public void apply() {
+        JTextArea textArea = wp.getTextArea();
+        textArea.setForeground(foreground);
+        textArea.setBackground(background);
+        textArea.setTabSize(tabSize);
+        textArea.setFont(font);
     }
 }

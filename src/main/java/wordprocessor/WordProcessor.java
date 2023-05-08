@@ -88,9 +88,11 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         contentPane.add(scrollPane);
         setContentPane(contentPane);
         fileChooser = new JFileChooser();
-        settingsDialog = new SettingsDialog(this);
         setupKeyListener();
-        applySettings();
+        settingsDialog = new SettingsDialog(this);
+        Settings settings = Settings.getInstance(null);
+        settings.apply();
+        setVisible(true);
     }
     
     private void setupKeyListener() {
@@ -116,14 +118,10 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
     
-    public void applySettings() {
-        Settings settings = Settings.getInstance();
-        textArea.setForeground(settings.getForeground());
-        textArea.setBackground(settings.getBackground());
-        textArea.setTabSize(settings.getTabSize());
-        textArea.setFont(settings.getFont());
+    public JTextArea getTextArea() {
+        return textArea;
     }
-        
+    
     public void newFile() {
         file = null;
         textArea.setText("");
@@ -192,10 +190,9 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     public void menuCanceled(MenuEvent e) {}
                 
     public static void main(String[] args) {
-        Settings settings = Settings.getInstance();
+        WordProcessor wp = new WordProcessor();
+        Settings settings = Settings.getInstance(wp);
         settings.load(new File(System.getProperty("user.home"), ".wordprocessor"));
-        WordProcessor wordProcessor = new WordProcessor();
-        wordProcessor.createAndShowGui();
-        wordProcessor.setVisible(true);
+        wp.createAndShowGui();
     }
 }

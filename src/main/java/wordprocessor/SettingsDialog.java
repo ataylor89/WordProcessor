@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,18 +23,16 @@ import javax.swing.JPanel;
  */
 public class SettingsDialog extends JDialog implements ActionListener {
     
-    private final WordProcessor wp;
     private final Settings settings;
     private JPanel contentPane;
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
     private JButton chooseFgColor, chooseBgColor, save, cancel;
     
-    public SettingsDialog(WordProcessor wp) {
-        super(wp, true);
+    public SettingsDialog(Frame frame) {
+        super(frame, true);
         super.setTitle("Settings");
         super.setSize(500, 500);
-        this.wp = wp;
-        this.settings = Settings.getInstance();
+        this.settings = Settings.getInstance(null);
         createDialog();
     }
     
@@ -122,7 +121,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
             settings.setFont(font);
             Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
             settings.setTabSize(tabSize);
-            wp.applySettings();
+            settings.apply();
             setVisible(false);
         }
         else if (e.getSource() == cancel) {
