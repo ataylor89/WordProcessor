@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class Settings {
     
-    private static Settings settings;
+    private static Settings instance;
     private Font font;
     private Color foreground;
     private Color background;
@@ -32,10 +32,10 @@ public class Settings {
     }
     
     public static Settings getInstance() {
-        if (settings == null) {
-            settings = new Settings();
+        if (instance == null) {
+            instance = new Settings();
         }
-        return settings;
+        return instance;
     }
      
     public void load(File file) {
@@ -46,8 +46,8 @@ public class Settings {
                 String selection = properties.getProperty("FONT");
                 Matcher matcher = fontPattern.matcher(selection);
                 if (matcher.matches()) {
-                    String fontFamily = matcher.group(0);
-                    Integer fontSize = Integer.parseInt(matcher.group(1));
+                    String fontFamily = matcher.group(1);
+                    Integer fontSize = Integer.parseInt(matcher.group(2));
                     font = new Font(fontFamily, Font.PLAIN, fontSize);
                 }
             }
