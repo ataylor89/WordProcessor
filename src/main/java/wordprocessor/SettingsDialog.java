@@ -30,13 +30,13 @@ public class SettingsDialog extends JDialog implements ActionListener {
     
     public SettingsDialog(Frame frame) {
         super(frame, true);
-        super.setTitle("Settings");
-        super.setSize(500, 500);
-        this.settings = Settings.getInstance(null);
-        createDialog();
+        settings = Settings.getInstance(null);
+        init();
     }
     
-    private void createDialog() {
+    private void init() {
+        setTitle("Settings");
+        setSize(500, 500);
         contentPane = new JPanel();        
         contentPane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -77,6 +77,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         cancel.addActionListener(this);
         addComponent(cancel, c, 3, 9, 1, 1);
         this.setContentPane(contentPane);
+        reset();
     }
     
     private void addComponent(Component cmp, GridBagConstraints cs, int gridx, int gridy, int weightx, int weighty) {
@@ -87,7 +88,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         contentPane.add(cmp, cs);
     }
     
-    public void showDialog() {
+    public void reset() {
         Font font = settings.getFont();
         Color fgcolor = settings.getForeground();
         Color bgcolor = settings.getBackground();
@@ -97,7 +98,6 @@ public class SettingsDialog extends JDialog implements ActionListener {
         chooseFgColor.setBackground(fgcolor);
         chooseBgColor.setBackground(bgcolor);
         chooseTabSize.setSelectedItem(String.valueOf(tabSize));
-        setVisible(true);
     }
     
     @Override
@@ -126,6 +126,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         }
         else if (e.getSource() == cancel) {
             setVisible(false);
+            reset();
         }
     }
 }

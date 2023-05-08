@@ -166,7 +166,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         } else if (e.getSource() == open) {
             openFile();
         } else if (e.getSource() == preferences) {
-            settingsDialog.showDialog();
+            settingsDialog.setVisible(true);
         } else if (e.getSource() == exit) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);
@@ -192,7 +192,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     public static void main(String[] args) {
         WordProcessor wp = new WordProcessor();
         Settings settings = Settings.getInstance(wp);
-        settings.load(new File(System.getProperty("user.home"), ".wordprocessor"));
+        settings.load();
         wp.createAndShowGui();
     }
 }

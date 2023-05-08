@@ -40,7 +40,20 @@ public class Settings {
         }
         return instance;
     }
-     
+    
+    public void load() {
+        File file = new File(System.getProperty("user.home"), ".wordprocessor");
+        if (file.exists()) {
+            load(file);
+        } 
+        else {
+            file = new File(System.getProperty("user.dir"), ".wordprocessor");
+            if (file.exists()) {
+                load(file);
+            }
+        }
+    }
+    
     public void load(File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             Properties properties = new Properties();
