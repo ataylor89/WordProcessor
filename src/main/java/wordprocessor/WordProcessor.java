@@ -1,10 +1,6 @@
 package wordprocessor;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -18,8 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.InputMap;
-import javax.swing.JColorChooser;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -39,25 +33,19 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
 
     private JMenuBar bar;
     private JMenu fileMenu;
-    private JMenuItem newFile, saveFile, saveFileAs, openFile, exit;
-    private JMenu colorsMenu;
-    private JMenuItem fgcolor, bgcolor, whiteblack, grayblue, tealwhite, purplewhite, seaTheme;
-    private JMenu toolsMenu;
-    private JMenuItem setTabSize, lineCount, characterCount, copyToClipboard;
+    private JMenuItem create, save, saveAs, open, preferences, exit;
     private JPanel contentPane;
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JFileChooser fileChooser;
+    private SettingsDialog settingsDialog;
     private File file;
-    private Config config;
     
     public WordProcessor() {
         super("Word Processor");
-        config = new Config();
-        config.load();
     }
     
-    public void setLookAndFeel() {
+    private void setLookAndFeel() {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
@@ -68,83 +56,49 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     public void createAndShowGui() {
         setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLookAndFeel();
         bar = new JMenuBar();
         fileMenu = new JMenu("File");
         fileMenu.addMenuListener(this);
-        newFile = new JMenuItem("New");
-        newFile.addActionListener(this);
-        saveFile = new JMenuItem("Save");
-        saveFile.addActionListener(this);
-        saveFileAs = new JMenuItem("Save as");
-        saveFileAs.addActionListener(this);
-        openFile = new JMenuItem("Open");
-        openFile.addActionListener(this);
+        create = new JMenuItem("New");
+        create.addActionListener(this);
+        save = new JMenuItem("Save");
+        save.addActionListener(this);
+        saveAs = new JMenuItem("Save as");
+        saveAs.addActionListener(this);
+        open = new JMenuItem("Open");
+        open.addActionListener(this);
+        preferences = new JMenuItem("Preferences");
+        preferences.addActionListener(this);
         exit = new JMenuItem("Exit");
         exit.addActionListener(this);
-        fileMenu.add(newFile);
-        fileMenu.add(saveFile);
-        fileMenu.add(saveFileAs);
-        fileMenu.add(openFile);
+        fileMenu.add(create);
+        fileMenu.add(save);
+        fileMenu.add(saveAs);
+        fileMenu.add(open);
+        fileMenu.add(preferences);
         fileMenu.add(exit);
-        colorsMenu = new JMenu("Colors");
-        fgcolor = new JMenuItem("Set foreground color");
-        fgcolor.addActionListener(this);
-        bgcolor = new JMenuItem("Set background color");
-        bgcolor.addActionListener(this);
-        whiteblack = new JMenuItem("White black");
-        whiteblack.addActionListener(this);
-        grayblue = new JMenuItem("Gray blue");
-        grayblue.addActionListener(this);
-        tealwhite = new JMenuItem("Teal white");
-        tealwhite.addActionListener(this);
-        purplewhite = new JMenuItem("Purple white");
-        purplewhite.addActionListener(this);
-        seaTheme = new JMenuItem("Sea theme");
-        seaTheme.addActionListener(this);
-        colorsMenu.add(fgcolor);
-        colorsMenu.add(bgcolor);
-        colorsMenu.add(whiteblack);
-        colorsMenu.add(grayblue);
-        colorsMenu.add(tealwhite);
-        colorsMenu.add(purplewhite);
-        colorsMenu.add(seaTheme);
-        toolsMenu = new JMenu("Tools");
-        setTabSize = new JMenuItem("Set tab size");
-        setTabSize.addActionListener(this);
-        lineCount = new JMenuItem("Get line count");
-        lineCount.addActionListener(this);
-        characterCount = new JMenuItem("Get character count");
-        characterCount.addActionListener(this);
-        copyToClipboard = new JMenuItem("Copy text to clipboard");
-        copyToClipboard.addActionListener(this);
-        toolsMenu.add(setTabSize);
-        toolsMenu.add(lineCount);
-        toolsMenu.add(characterCount);
-        toolsMenu.add(copyToClipboard);
         bar.add(fileMenu);
-        bar.add(colorsMenu);
-        bar.add(toolsMenu);
         setJMenuBar(bar);
         contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         textArea = new JTextArea();
         textArea.setLineWrap(true);
-        textArea.setTabSize(2);
-        textArea.setForeground(config.getForegroundColor());
-        textArea.setBackground(config.getBackgroundColor());
         scrollPane = new JScrollPane(textArea);
         contentPane.add(scrollPane);
         setContentPane(contentPane);
         fileChooser = new JFileChooser();
-        setupKeyStrokes();
+        settingsDialog = new SettingsDialog(this);
+        setupKeyListener();
+        applySettings();
     }
     
-    public void setupKeyStrokes() {
+    private void setupKeyListener() {
         ActionMap am = textArea.getActionMap();
         Action cmdS = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveToFile();
+                saveFile();
             }
         };
         Action cmdO = new AbstractAction() {
@@ -161,13 +115,21 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "cmd+s");
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
+    
+    public void applySettings() {
+        Settings settings = Settings.getInstance();
+        textArea.setForeground(settings.getForeground());
+        textArea.setBackground(settings.getBackground());
+        textArea.setTabSize(settings.getTabSize());
+        textArea.setFont(settings.getFont());
+    }
         
     public void newFile() {
         file = null;
         textArea.setText("");
     }
     
-    private void saveToFile() {
+    public void saveFile() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
             String text = textArea.getText();
             bufferedWriter.write(text);
@@ -176,14 +138,14 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         } 
     }
 
-    private void saveToFileAs() {
+    public void saveFileAs() {
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.file = fileChooser.getSelectedFile();
-            saveToFile();
+            saveFile();
         }
     }
 
-    private void openFile() {
+    public void openFile() {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.file = fileChooser.getSelectedFile();
             try {
@@ -197,66 +159,29 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
    
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == newFile) {
+        if (e.getSource() == create) {
             newFile();
-        } else if (e.getSource() == saveFile) {
-            saveToFile();
-        } else if (e.getSource() == saveFileAs) {
-            saveToFileAs();
-        } else if (e.getSource() == openFile) {
+        } else if (e.getSource() == save) {
+            saveFile();
+        } else if (e.getSource() == saveAs) {
+            saveFileAs();
+        } else if (e.getSource() == open) {
             openFile();
+        } else if (e.getSource() == preferences) {
+            settingsDialog.showDialog();
         } else if (e.getSource() == exit) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);
-        } else if (e.getSource() == fgcolor) {
-            Color color = JColorChooser.showDialog(this, "Select a foreground color", textArea.getForeground());
-            if (color != null) {
-                textArea.setForeground(color);
-            }
-        } else if (e.getSource() == bgcolor) {
-            Color color = JColorChooser.showDialog(this, "Select a background color", textArea.getBackground());
-            if (color != null) { 
-                textArea.setBackground(color);
-            }
-        } else if (e.getSource() == whiteblack) {
-            textArea.setForeground(Color.BLACK);
-            textArea.setBackground(Color.WHITE);
-        } else if (e.getSource() == grayblue) {
-            textArea.setForeground(new Color(0, 0, 204, 255));
-            textArea.setBackground(new Color(204, 204, 204, 255));
-        } else if (e.getSource() == tealwhite) {
-            textArea.setForeground(Color.WHITE);
-            textArea.setBackground(new Color(0, 153, 153, 255));
-        } else if (e.getSource() == purplewhite) {
-            textArea.setForeground(Color.WHITE);
-            textArea.setBackground(new Color(153, 0, 153, 255));
-        } else if (e.getSource() == seaTheme) {
-            textArea.setForeground(Color.WHITE);
-            textArea.setBackground(new Color(0, 153, 255, 255));
-        } else if (e.getSource() == setTabSize) {
-            Integer[] tabSizes = new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-            Integer tabSize = (Integer) JOptionPane.showInputDialog(this, "Select tab size", "Tab size", JOptionPane.QUESTION_MESSAGE, null, tabSizes, textArea.getTabSize());
-            if (tabSize != null) {
-                textArea.setTabSize(tabSize);
-            }
-        } else if (e.getSource() == lineCount) {
-            JOptionPane.showMessageDialog(this, "There are " + textArea.getLineCount() + " lines in the file");
-        } else if (e.getSource() == characterCount) {
-            JOptionPane.showMessageDialog(this, "There are " + textArea.getText().length() + " characters in the file");
-        } else if (e.getSource() == copyToClipboard) {
-            StringSelection stringSelection = new StringSelection(textArea.getText());
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(stringSelection, null);
-        }
+        } 
     }
     
     @Override
     public void menuSelected(MenuEvent e) {
         if (file == null) {
-            saveFile.setEnabled(false);
+            save.setEnabled(false);
         }
         else {
-            saveFile.setEnabled(true);
+            save.setEnabled(true);
         }
     }
 
@@ -265,10 +190,11 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
 
     @Override
     public void menuCanceled(MenuEvent e) {}
-    
+                
     public static void main(String[] args) {
+        Settings settings = Settings.getInstance();
+        settings.load(new File(System.getProperty("user.home"), ".wordprocessor"));
         WordProcessor wordProcessor = new WordProcessor();
-        wordProcessor.setLookAndFeel();
         wordProcessor.createAndShowGui();
         wordProcessor.setVisible(true);
     }
