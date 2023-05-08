@@ -2,6 +2,7 @@ package wordprocessor;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -24,9 +25,8 @@ public class SettingsDialog extends JDialog implements ActionListener {
     private final WordProcessor wp;
     private final Settings settings;
     private JPanel contentPane;
-    private ColorSwatch chooseFgColor, chooseBgColor;
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
-    private JButton save, cancel;
+    private JButton chooseFgColor, chooseBgColor, save, cancel;
     
     public SettingsDialog(WordProcessor wp) {
         super(wp, true);
@@ -49,11 +49,13 @@ public class SettingsDialog extends JDialog implements ActionListener {
         addComponent(chooseTheme, c, 1, 0, 9, 1);
         c.insets = new Insets(0, 20, 0, 0);
         addComponent(new JLabel("Foreground color:"), c, 0, 1, 1, 1);
-        chooseFgColor = new ColorSwatch();
+        chooseFgColor = new JButton();
+        chooseFgColor.setPreferredSize(new Dimension(24, 24));
         chooseFgColor.addActionListener(this);
         addComponent(chooseFgColor, c, 1, 1, 9, 1);
         addComponent(new JLabel("Background color:"), c, 0, 2, 1, 1);
-        chooseBgColor = new ColorSwatch();
+        chooseBgColor = new JButton();
+        chooseBgColor.setPreferredSize(new Dimension(24, 24));
         chooseBgColor.addActionListener(this);
         addComponent(chooseBgColor, c, 1, 2, 9, 1);
         addComponent(new JLabel("Tab size:"), c, 0, 3, 1, 1);
@@ -93,8 +95,8 @@ public class SettingsDialog extends JDialog implements ActionListener {
         int tabSize = settings.getTabSize();
         chooseFontFamily.setSelectedItem(font.getFamily());
         chooseFontSize.setSelectedItem(String.valueOf(font.getSize()));
-        chooseFgColor.setColor(fgcolor);
-        chooseBgColor.setColor(bgcolor);
+        chooseFgColor.setBackground(fgcolor);
+        chooseBgColor.setBackground(bgcolor);
         chooseTabSize.setSelectedItem(String.valueOf(tabSize));
         setVisible(true);
     }
@@ -104,16 +106,16 @@ public class SettingsDialog extends JDialog implements ActionListener {
         if (e.getSource() == chooseFgColor) {
             Color initial = settings.getForeground();
             Color choice = JColorChooser.showDialog(this, "Chooose foreground color", initial);
-            chooseFgColor.setColor(choice);
+            chooseFgColor.setBackground(choice);
         }
         else if (e.getSource() == chooseBgColor) {
             Color initial = settings.getBackground();
             Color choice = JColorChooser.showDialog(this, "Chooose background color", initial);
-            chooseBgColor.setColor(choice);
+            chooseBgColor.setBackground(choice);
         }
         else if (e.getSource() == save) {
-            settings.setBackground(chooseBgColor.getColor());
-            settings.setForeground(chooseFgColor.getColor());
+            settings.setBackground(chooseBgColor.getBackground());
+            settings.setForeground(chooseFgColor.getBackground());
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
             Integer fontSize = Integer.parseInt((String) chooseFontSize.getSelectedItem());
             Font font = new Font(fontFamily, Font.PLAIN, fontSize);
