@@ -18,19 +18,21 @@ public class Settings {
     
     private static Settings instance;
     private WordProcessor wp;
-    private Font font;
+    private Theme theme;
     private Color foreground;
     private Color background;
+    private Font font;
     private int tabSize;
-    private final Pattern fontPattern, colorPattern;
+    private final Pattern colorPattern, fontPattern;
     
     private Settings() {
-        font = new Font("SansSerif", Font.PLAIN, 12);
+        theme = Theme.SEA;
         foreground = Color.BLACK;
         background = Color.WHITE;
         tabSize = 4;
-        fontPattern = Pattern.compile("([a-zA-Z1-9 ]+),(\\d+)");
+        font = new Font("SansSerif", Font.PLAIN, 12);
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
+        fontPattern = Pattern.compile("([a-zA-Z1-9 ]+),(\\d+)");
     }
     
     private Settings(WordProcessor wp) {
@@ -69,14 +71,9 @@ public class Settings {
         try (FileInputStream in = new FileInputStream(file)) {
             Properties properties = new Properties();
             properties.load(in);
-            if (properties.containsKey("FONT")) {
-                String selection = properties.getProperty("FONT");
-                Matcher matcher = fontPattern.matcher(selection);
-                if (matcher.matches()) {
-                    String fontFamily = matcher.group(1);
-                    Integer fontSize = Integer.parseInt(matcher.group(2));
-                    font = new Font(fontFamily, Font.PLAIN, fontSize);
-                }
+            if (properties.containsKey("THEME")) {
+                String themeName = properties.getProperty("THEME");
+                theme = Theme.forName(themeName);
             }
             if (properties.containsKey("FOREGROUND_COLOR")) {
                 String fgcolor = properties.getProperty("FOREGROUND_COLOR");
@@ -102,6 +99,15 @@ public class Settings {
                     background = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
                 }
             }
+            if (properties.containsKey("FONT")) {
+                String selection = properties.getProperty("FONT");
+                Matcher matcher = fontPattern.matcher(selection);
+                if (matcher.matches()) {
+                    String fontFamily = matcher.group(1);
+                    Integer fontSize = Integer.parseInt(matcher.group(2));
+                    font = new Font(fontFamily, Font.PLAIN, fontSize);
+                }
+            }
             if (properties.containsKey("TAB_SIZE")) {
                 tabSize = Integer.parseInt(properties.getProperty("TAB_SIZE"));
             }
@@ -109,13 +115,13 @@ public class Settings {
             System.err.println(e);
         }
     }
-    
-    public void setFont(Font font) {
-        this.font = font;
+        
+    public void setTheme(Theme theme) {
+        this.theme = theme;
     }
     
-    public Font getFont() {
-        return font;
+    public Theme getTheme() {
+        return theme;
     }
     
     public void setForeground(Color foreground) {
@@ -140,6 +146,14 @@ public class Settings {
     
     public int getTabSize() {
         return tabSize;
+    }
+    
+    public void setFont(Font font) {
+        this.font = font;
+    }
+    
+    public Font getFont() {
+        return font;
     }
     
     public void setGui(WordProcessor wp) {

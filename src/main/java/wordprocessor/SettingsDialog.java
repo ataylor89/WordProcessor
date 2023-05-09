@@ -26,7 +26,8 @@ public class SettingsDialog extends JDialog implements ActionListener {
     private final Settings settings;
     private JPanel contentPane;
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
-    private JButton chooseFgColor, chooseBgColor, save, cancel;
+    private JButton chooseFgColor, chooseBgColor;
+    private JButton save, cancel;
     
     public SettingsDialog(Frame frame) {
         super(frame, true);
@@ -43,8 +44,10 @@ public class SettingsDialog extends JDialog implements ActionListener {
         c.anchor = GridBagConstraints.NORTHWEST;
         c.insets = new Insets(40, 20, 0, 0);
         addComponent(new JLabel("Theme:"), c, 0, 0, 1, 1);
-        String[] themes = new String[] {"Sea Theme", "Purple White"};
+        String[] themes = Theme.getNames();
         chooseTheme = new JComboBox(themes);
+        chooseTheme.addItem("Custom");
+        chooseTheme.addActionListener(this);
         addComponent(chooseTheme, c, 1, 0, 9, 1);
         c.insets = new Insets(0, 20, 0, 0);
         addComponent(new JLabel("Foreground color:"), c, 0, 1, 1, 1);
@@ -66,7 +69,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         chooseFontFamily = new JComboBox(fonts);
         addComponent(chooseFontFamily, c, 1, 4, 9, 1);
         addComponent(new JLabel("Font size:"), c, 0, 5, 1, 1);
-        String[] fontSizes = new String[] {"10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
+        String[] fontSizes = new String[] {"12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"};
         chooseFontSize = new JComboBox(fontSizes);
         addComponent(chooseFontSize, c, 1, 5, 9, 1);
         save = new JButton("Save");
@@ -89,10 +92,12 @@ public class SettingsDialog extends JDialog implements ActionListener {
     }
     
     public void reset() {
-        Font font = settings.getFont();
+        Theme theme = settings.getTheme();
         Color fgcolor = settings.getForeground();
         Color bgcolor = settings.getBackground();
+        Font font = settings.getFont();
         int tabSize = settings.getTabSize();
+        chooseTheme.setSelectedItem(theme.getName());
         chooseFontFamily.setSelectedItem(font.getFamily());
         chooseFontSize.setSelectedItem(String.valueOf(font.getSize()));
         chooseFgColor.setBackground(fgcolor);
@@ -102,15 +107,29 @@ public class SettingsDialog extends JDialog implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == chooseFgColor) {
+        if (e.getSource() == chooseTheme) {
+            String name = (String) chooseTheme.getSelectedItem();
+            if (!name.equals("Custom")) {
+                Theme theme = Theme.forName(name);
+                chooseFgColor.setBackground(theme.getForeground());
+                chooseBgColor.setBackground(theme.getBackground());
+            }
+        }
+        else if (e.getSource() == chooseFgColor) {
             Color initial = settings.getForeground();
             Color choice = JColorChooser.showDialog(this, "Chooose foreground color", initial);
-            chooseFgColor.setBackground(choice);
+            if (choice != null) {
+                chooseFgColor.setBackground(choice);
+                chooseTheme.setSelectedItem("Custom");
+            }
         }
         else if (e.getSource() == chooseBgColor) {
             Color initial = settings.getBackground();
             Color choice = JColorChooser.showDialog(this, "Chooose background color", initial);
-            chooseBgColor.setBackground(choice);
+            if (choice != null) {
+                chooseBgColor.setBackground(choice);
+                chooseTheme.setSelectedItem("Custom");
+            }
         }
         else if (e.getSource() == save) {
             settings.setBackground(chooseBgColor.getBackground());
