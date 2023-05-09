@@ -42,7 +42,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         contentPane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTHWEST;
-        c.insets = new Insets(40, 20, 0, 0);
+        c.insets = new Insets(20, 20, 0, 0);
         addComponent(new JLabel("Theme:"), c, 0, 0, 1, 1);
         String[] themes = Theme.getNames();
         chooseTheme = new JComboBox(themes);
@@ -74,10 +74,11 @@ public class SettingsDialog extends JDialog implements ActionListener {
         save = new JButton("Save");
         super.getRootPane().setDefaultButton(save);
         save.addActionListener(this);
-        addComponent(save, c, 2, 9, 1, 1);
+        addComponent(save, c, 2, 8, 1, 1);
         cancel = new JButton("Cancel");
         cancel.addActionListener(this);
-        addComponent(cancel, c, 3, 9, 1, 1);
+        c.insets = new Insets(0, 20, 0, 20);
+        addComponent(cancel, c, 3, 8, 1, 1);
         this.setContentPane(contentPane);
         setDefaults();
     }
