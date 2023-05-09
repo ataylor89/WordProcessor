@@ -14,7 +14,6 @@ if [ ! -f icons.icns ]; then
     iconutil -c icns icons.iconset
 fi
 mvn clean install
-mvn assembly:single
 jpackage --input target/ \
   --name WordProcessor \
   --main-jar WordProcessor.jar \
