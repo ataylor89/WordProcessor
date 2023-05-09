@@ -131,6 +131,9 @@ public class SettingsDialog extends JDialog implements ActionListener {
             }
         }
         else if (e.getSource() == save) {
+            String themeName = (String) chooseTheme.getSelectedItem();
+            Theme theme = Theme.forName(themeName);
+            settings.setTheme(theme);
             settings.setBackground(chooseBgColor.getBackground());
             settings.setForeground(chooseFgColor.getBackground());
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
