@@ -27,8 +27,6 @@ public class Settings {
     
     private Settings() {
         theme = Theme.SEA;
-        foreground = Color.BLACK;
-        background = Color.WHITE;
         tabSize = 4;
         font = new Font("SansSerif", Font.PLAIN, 12);
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
