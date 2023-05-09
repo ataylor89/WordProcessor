@@ -1,5 +1,5 @@
 if [ ! -f icons.icns ]; then
-    ICON="icons/bookspenink.png"   
+    ICON="icons/WordProcessor.png"   
     mkdir icons.iconset
     sips -z 512 512   $ICON --out icons.iconset/icon_512x512.png
     cp $ICON icons.iconset/icon_512x512@2x.png
@@ -17,7 +17,7 @@ mvn clean install
 mvn assembly:single
 jpackage --input target/ \
   --name WordProcessor \
-  --main-jar WordProcessor-jar-with-dependencies.jar \
+  --main-jar WordProcessor.jar \
   --main-class wordprocessor.WordProcessor \
   --type dmg \
   --icon "icons.icns" \
