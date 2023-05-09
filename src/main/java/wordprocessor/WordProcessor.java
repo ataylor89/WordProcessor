@@ -61,6 +61,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         create.addActionListener(this);
         save = new JMenuItem("Save");
         save.addActionListener(this);
+        save.setEnabled(false);
         saveAs = new JMenuItem("Save as");
         saveAs.addActionListener(this);
         open = new JMenuItem("Open");
