@@ -1,6 +1,7 @@
 package wordprocessor;
 
 import java.awt.Color;
+import java.util.stream.Stream;
 
 /**
  *
@@ -35,20 +36,14 @@ public enum Theme {
     }
         
     public static Theme forName(String name) {
-        for (Theme theme : Theme.values()) {
-            if (theme.getName().equals(name)) {
-                return theme;
-            }
-        }
-        return null;
+        return Stream.of(values())
+                .filter(theme -> theme.getName().equals(name))
+                .findFirst().orElse(null);
     }
     
     public static String[] getNames() {
-        Theme[] themes = values();
-        String[] names = new String[themes.length];
-        for (int i = 0; i < names.length; i++) {
-            names[i] = themes[i].getName();
-        }
-        return names;
+        return Stream.of(values())
+                .map(theme -> theme.getName())
+                .toArray(n -> new String[n]);
     }
 }
