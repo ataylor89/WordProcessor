@@ -79,7 +79,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         cancel.addActionListener(this);
         addComponent(cancel, c, 3, 9, 1, 1);
         this.setContentPane(contentPane);
-        reset();
+        setDefaults();
     }
     
     private void addComponent(Component cmp, GridBagConstraints cs, int gridx, int gridy, int weightx, int weighty) {
@@ -90,7 +90,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         contentPane.add(cmp, cs);
     }
     
-    public void reset() {
+    public void setDefaults() {
         Theme theme = settings.getTheme();
         Color fgcolor = settings.getForeground();
         Color bgcolor = settings.getBackground();
@@ -147,7 +147,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         }
         else if (e.getSource() == cancel) {
             setVisible(false);
-            reset();
+            setDefaults();
         }
     }
 }
