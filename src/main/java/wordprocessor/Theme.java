@@ -10,7 +10,8 @@ public enum Theme {
     
     SEA ("Sea Theme", new Color(255,255,255), new Color(0,153,255)),
     WHITE_PURPLE ("White Purple", new Color(255,255,255), new Color(153,0,153)),
-    BLUE_GRAY ("Blue Gray", new Color(0,0,204), new Color(204,204,204));
+    BLUE_GRAY ("Blue Gray", new Color(0,0,204), new Color(204,204,204)),
+    CUSTOM ("Custom", null, null);
     
     private final String name;
     private final Color foreground, background;

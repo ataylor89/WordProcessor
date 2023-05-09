@@ -46,7 +46,6 @@ public class SettingsDialog extends JDialog implements ActionListener {
         addComponent(new JLabel("Theme:"), c, 0, 0, 1, 1);
         String[] themes = Theme.getNames();
         chooseTheme = new JComboBox(themes);
-        chooseTheme.addItem("Custom");
         chooseTheme.addActionListener(this);
         addComponent(chooseTheme, c, 1, 0, 9, 1);
         c.insets = new Insets(0, 20, 0, 0);
