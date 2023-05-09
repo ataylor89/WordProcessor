@@ -8,7 +8,7 @@ import java.awt.Color;
  */
 public enum Theme {
     
-    SEA ("Sea Theme", new Color(0,153,255), new Color(255,255,255)),
+    SEA ("Sea Theme", new Color(255,255,255), new Color(0,153,255)),
     WHITE_PURPLE ("White Purple", new Color(255,255,255), new Color(153,0,153)),
     BLUE_GRAY ("Blue Gray", new Color(0,0,204), new Color(204,204,204)),
     PURPLE_WHITE ("Purple White", new Color(153,0,153), new Color(255,255,255)),
