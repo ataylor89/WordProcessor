@@ -21,15 +21,13 @@ import javax.swing.text.DefaultEditorKit;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.nio.file.Files;
 
-public class WordProcessor extends JFrame implements ActionListener, MenuListener {
+public class WordProcessor extends JFrame implements ActionListener {
 
     private JMenuBar bar;
     private JMenu fileMenu;
@@ -59,7 +57,6 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         setLookAndFeel();
         bar = new JMenuBar();
         fileMenu = new JMenu("File");
-        fileMenu.addMenuListener(this);
         create = new JMenuItem("New");
         create.addActionListener(this);
         save = new JMenuItem("Save");
@@ -126,6 +123,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
     public void newFile() {
         file = null;
         textArea.setText("");
+        save.setEnabled(false);
     }
     
     public void saveFile() {
@@ -141,6 +139,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.file = fileChooser.getSelectedFile();
             saveFile();
+            save.setEnabled(true);
         }
     }
 
@@ -150,6 +149,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
             try {
                 String text = Files.readString(file.toPath());
                 textArea.setText(text);
+                save.setEnabled(true);
             } catch (IOException e) {
                 System.err.println(e);
             }
@@ -173,23 +173,7 @@ public class WordProcessor extends JFrame implements ActionListener, MenuListene
             System.exit(0);
         } 
     }
-    
-    @Override
-    public void menuSelected(MenuEvent e) {
-        if (file == null) {
-            save.setEnabled(false);
-        }
-        else {
-            save.setEnabled(true);
-        }
-    }
-
-    @Override
-    public void menuDeselected(MenuEvent e) {}
-
-    @Override
-    public void menuCanceled(MenuEvent e) {}
-                
+                    
     public static void main(String[] args) {
         WordProcessor wp = new WordProcessor();
         wp.createAndShowGui();
