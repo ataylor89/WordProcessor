@@ -146,10 +146,10 @@ public class SettingsDialog extends JDialog implements ActionListener {
         fileChooser = new JFileChooser(settings.getDirectory());
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         this.setContentPane(contentPane);
-        useDefaults();
+        setDefaults();
     }
         
-    public void useDefaults() {
+    public void setDefaults() {
         Settings settings = Settings.getInstance();
         Theme theme = settings.getTheme();
         Color fgcolor = settings.getForeground();
@@ -218,7 +218,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         }
         else if (e.getSource() == cancel) {
             setVisible(false);
-            useDefaults();
+            setDefaults();
         }
     }
 }
