@@ -31,12 +31,12 @@ public class WordProcessor extends JFrame implements ActionListener {
 
     private JMenuBar bar;
     private JMenu fileMenu;
-    private JMenuItem create, save, saveAs, open, preferences, exit;
+    private JMenuItem newFile, saveFile, saveFileAs, openFile, editPreferences, exit;
     private JPanel contentPane;
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JFileChooser fileChooser;
-    private SettingsDialog settingsDialog;
+    private PreferencesDialog preferencesDialog;
     private File file;
     
     public WordProcessor() {
@@ -57,24 +57,24 @@ public class WordProcessor extends JFrame implements ActionListener {
         setLookAndFeel();
         bar = new JMenuBar();
         fileMenu = new JMenu("File");
-        create = new JMenuItem("New");
-        create.addActionListener(this);
-        save = new JMenuItem("Save");
-        save.addActionListener(this);
-        save.setEnabled(false);
-        saveAs = new JMenuItem("Save as");
-        saveAs.addActionListener(this);
-        open = new JMenuItem("Open");
-        open.addActionListener(this);
-        preferences = new JMenuItem("Preferences");
-        preferences.addActionListener(this);
+        newFile = new JMenuItem("New");
+        newFile.addActionListener(this);
+        saveFile = new JMenuItem("Save");
+        saveFile.addActionListener(this);
+        saveFile.setEnabled(false);
+        saveFileAs = new JMenuItem("Save as");
+        saveFileAs.addActionListener(this);
+        openFile = new JMenuItem("Open");
+        openFile.addActionListener(this);
+        editPreferences = new JMenuItem("Preferences");
+        editPreferences.addActionListener(this);
         exit = new JMenuItem("Exit");
         exit.addActionListener(this);
-        fileMenu.add(create);
-        fileMenu.add(save);
-        fileMenu.add(saveAs);
-        fileMenu.add(open);
-        fileMenu.add(preferences);
+        fileMenu.add(newFile);
+        fileMenu.add(saveFile);
+        fileMenu.add(saveFileAs);
+        fileMenu.add(openFile);
+        fileMenu.add(editPreferences);
         fileMenu.add(exit);
         bar.add(fileMenu);
         setJMenuBar(bar);
@@ -87,10 +87,11 @@ public class WordProcessor extends JFrame implements ActionListener {
         setContentPane(contentPane);
         fileChooser = new JFileChooser();
         setupKeyListener();
-        Settings settings = Settings.getInstance(this);
-        settings.load();
-        settings.apply();
-        settingsDialog = new SettingsDialog(this);
+        Preferences preferences = Preferences.getInstance();
+        preferences.setGui(this);
+        preferences.load();
+        preferences.apply();
+        preferencesDialog = new PreferencesDialog(this);
         setVisible(true);
     }
     
@@ -128,7 +129,7 @@ public class WordProcessor extends JFrame implements ActionListener {
     public void newFile() {
         file = null;
         textArea.setText("");
-        save.setEnabled(false);
+        saveFile.setEnabled(false);
     }
     
     public void saveFile() {
@@ -144,7 +145,7 @@ public class WordProcessor extends JFrame implements ActionListener {
         if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.file = fileChooser.getSelectedFile();
             saveFile();
-            save.setEnabled(true);
+            saveFile.setEnabled(true);
         }
     }
 
@@ -154,7 +155,7 @@ public class WordProcessor extends JFrame implements ActionListener {
             try {
                 String text = Files.readString(file.toPath());
                 textArea.setText(text);
-                save.setEnabled(true);
+                saveFile.setEnabled(true);
             } catch (IOException e) {
                 System.err.println(e);
             }
@@ -163,16 +164,16 @@ public class WordProcessor extends JFrame implements ActionListener {
    
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == create) {
+        if (e.getSource() == newFile) {
             newFile();
-        } else if (e.getSource() == save) {
+        } else if (e.getSource() == saveFile) {
             saveFile();
-        } else if (e.getSource() == saveAs) {
+        } else if (e.getSource() == saveFileAs) {
             saveFileAs();
-        } else if (e.getSource() == open) {
+        } else if (e.getSource() == openFile) {
             openFile();
-        } else if (e.getSource() == preferences) {
-            settingsDialog.setVisible(true);
+        } else if (e.getSource() == editPreferences) {
+            preferencesDialog.setVisible(true);
         } else if (e.getSource() == exit) {
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             System.exit(0);

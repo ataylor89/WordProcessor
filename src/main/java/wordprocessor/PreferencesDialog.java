@@ -22,27 +22,27 @@ import javax.swing.JPanel;
  *
  * @author andrewtaylor
  */
-public class SettingsDialog extends JDialog implements ActionListener {
+public class PreferencesDialog extends JDialog implements ActionListener {
     
     private JPanel contentPane;
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
     private JLabel directoryPath;
     private JButton chooseFgColor, chooseBgColor, chooseDirectory;
     private JFileChooser fileChooser;
-    private JButton save, cancel;
+    private JButton apply, cancel;
     
-    public SettingsDialog(Frame frame) {
+    public PreferencesDialog(Frame frame) {
         super(frame, true);
         init();
     }
     
     private void init() {
-        setTitle("Settings");
+        setTitle("Preferences");
         setSize(800, 600);
         contentPane = new JPanel();        
         contentPane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        Settings settings = Settings.getInstance();
+        Preferences preferences = Preferences.getInstance();
         
         JLabel themeLabel = new JLabel("Theme:");
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -119,7 +119,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         c.gridy = 6;
         contentPane.add(directoryLabel, c);
         
-        directoryPath = new JLabel(settings.getDirectory().getPath());
+        directoryPath = new JLabel(preferences.getDirectory().getPath());
         c.gridx = 1;
         contentPane.add(directoryPath, c);
         
@@ -129,13 +129,13 @@ public class SettingsDialog extends JDialog implements ActionListener {
         c.weightx = 8;
         contentPane.add(chooseDirectory, c);
             
-        save = new JButton("Save");
-        super.getRootPane().setDefaultButton(save);
-        save.addActionListener(this);
+        apply = new JButton("Apply");
+        super.getRootPane().setDefaultButton(apply);
+        apply.addActionListener(this);
         c.gridx = 3;
         c.gridy = 8;
         c.weightx = 1;
-        contentPane.add(save, c);
+        contentPane.add(apply, c);
         
         cancel = new JButton("Cancel");
         cancel.addActionListener(this);
@@ -143,19 +143,19 @@ public class SettingsDialog extends JDialog implements ActionListener {
         c.insets = new Insets(0, 20, 0, 20);
         contentPane.add(cancel, c);
         
-        fileChooser = new JFileChooser(settings.getDirectory());
+        fileChooser = new JFileChooser(preferences.getDirectory());
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         this.setContentPane(contentPane);
         setDefaults();
     }
         
     public void setDefaults() {
-        Settings settings = Settings.getInstance();
-        Theme theme = settings.getTheme();
-        Color fgcolor = settings.getForeground();
-        Color bgcolor = settings.getBackground();
-        Font font = settings.getFont();
-        int tabSize = settings.getTabSize();
+        Preferences preferences = Preferences.getInstance();
+        Theme theme = preferences.getTheme();
+        Color fgcolor = preferences.getForeground();
+        Color bgcolor = preferences.getBackground();
+        Font font = preferences.getFont();
+        int tabSize = preferences.getTabSize();
         chooseTheme.setSelectedItem(theme.getName());
         chooseFontFamily.setSelectedItem(font.getFamily());
         chooseFontSize.setSelectedItem(String.valueOf(font.getSize()));
@@ -166,7 +166,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        Settings settings = Settings.getInstance();
+        Preferences preferences = Preferences.getInstance();
         if (e.getSource() == chooseTheme) {
             String name = (String) chooseTheme.getSelectedItem();
             if (!name.equals("Custom")) {
@@ -176,7 +176,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
             }
         }
         else if (e.getSource() == chooseFgColor) {
-            Color initial = settings.getForeground();
+            Color initial = preferences.getForeground();
             Color choice = JColorChooser.showDialog(this, "Chooose foreground color", initial);
             if (choice != null) {
                 chooseFgColor.setBackground(choice);
@@ -184,7 +184,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
             }
         }
         else if (e.getSource() == chooseBgColor) {
-            Color initial = settings.getBackground();
+            Color initial = preferences.getBackground();
             Color choice = JColorChooser.showDialog(this, "Chooose background color", initial);
             if (choice != null) {
                 chooseBgColor.setBackground(choice);
@@ -197,23 +197,23 @@ public class SettingsDialog extends JDialog implements ActionListener {
                 directoryPath.setText(path);
             }
         }
-        else if (e.getSource() == save) {
+        else if (e.getSource() == apply) {
             String themeName = (String) chooseTheme.getSelectedItem();
             Theme theme = Theme.forName(themeName);
-            settings.setTheme(theme);
-            settings.setForeground(chooseFgColor.getBackground());
-            settings.setBackground(chooseBgColor.getBackground());
+            preferences.setTheme(theme);
+            preferences.setForeground(chooseFgColor.getBackground());
+            preferences.setBackground(chooseBgColor.getBackground());
             Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
-            settings.setTabSize(tabSize);
+            preferences.setTabSize(tabSize);
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
             Integer fontSize = Integer.parseInt((String) chooseFontSize.getSelectedItem());
             Font font = new Font(fontFamily, Font.PLAIN, fontSize);
-            settings.setFont(font);
+            preferences.setFont(font);
             File directory = fileChooser.getSelectedFile();
             if (directory != null) {
-                settings.setDirectory(directory);
+                preferences.setDirectory(directory);
             }
-            settings.apply();
+            preferences.apply();
             setVisible(false);
         }
         else if (e.getSource() == cancel) {

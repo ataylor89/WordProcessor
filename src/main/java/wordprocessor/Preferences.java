@@ -15,9 +15,8 @@ import javax.swing.JTextArea;
  *
  * @author andrewtaylor
  */
-public class Settings {
+public class Preferences {
     
-    private static Settings instance;
     private WordProcessor wp;
     private Theme theme;
     private Color foreground;
@@ -26,8 +25,9 @@ public class Settings {
     private Font font;
     private File directory;
     private final Pattern colorPattern, fontPattern;
+    private static Preferences instance;
     
-    private Settings() {
+    private Preferences() {
         theme = Theme.SEA;
         tabSize = 4;
         font = new Font("SansSerif", Font.PLAIN, 12);
@@ -36,21 +36,9 @@ public class Settings {
         fontPattern = Pattern.compile("([a-zA-Z1-9 ]+),(\\d+)");
     }
     
-    private Settings(WordProcessor wp) {
-        this();
-        this.wp = wp;
-    }
-    
-    public static Settings getInstance() {
+    public static Preferences getInstance() {
         if (instance == null) {
-            instance = new Settings();
-        }
-        return instance;
-    }
-    
-    public static Settings getInstance(WordProcessor wp) {
-        if (instance == null) {
-            instance = new Settings(wp);
+            instance = new Preferences();
         }
         return instance;
     }
