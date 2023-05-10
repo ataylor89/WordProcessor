@@ -112,6 +112,13 @@ public class Settings {
             if (properties.containsKey("TAB_SIZE")) {
                 tabSize = Integer.parseInt(properties.getProperty("TAB_SIZE"));
             }
+            if (properties.containsKey("DIRECTORY")) {
+                String path = properties.getProperty("DIRECTORY");
+                File f = new File(path);
+                if (f.exists() && f.isDirectory()) {
+                    directory = f;
+                }
+            }
         } catch (IOException e) {
             System.err.println(e);
         }

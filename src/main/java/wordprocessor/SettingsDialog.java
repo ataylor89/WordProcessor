@@ -143,7 +143,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
         c.insets = new Insets(0, 20, 0, 20);
         contentPane.add(cancel, c);
         
-        fileChooser = new JFileChooser(System.getProperty("user.home"));
+        fileChooser = new JFileChooser(settings.getDirectory());
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         this.setContentPane(contentPane);
         useDefaults();
