@@ -17,6 +17,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 /**
  *
@@ -25,7 +27,8 @@ import javax.swing.JPanel;
 public class PreferencesDialog extends JDialog implements ActionListener {
     
     private JPanel contentPane;
-    private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
+    private JComboBox chooseTheme, chooseTabSize, chooseFontFamily;
+    private JSpinner chooseFontSize;
     private JLabel directoryPath;
     private JButton chooseFgColor, chooseBgColor, chooseDirectory;
     private JFileChooser fileChooser;
@@ -99,7 +102,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.gridy = 4;
         contentPane.add(fontFamilyLabel, c);
         
-        String[] fonts = new String[] {"SansSerif", "Serif", "Courier New", "Times New Roman"};
+        String[] fonts = new String[] {"Arial", "Comic Sans MS", "Courier New", "Open Sans", "SansSerif", "Serif", "Times New Roman"};
         chooseFontFamily = new JComboBox(fonts);
         c.gridx = 1;
         contentPane.add(chooseFontFamily, c);
@@ -109,8 +112,9 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.gridy = 5;
         contentPane.add(fontSizeLabel, c);
              
-        String[] fontSizes = new String[] {"12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"};
-        chooseFontSize = new JComboBox(fontSizes);
+        int fontSize = preferences.getFont().getSize();
+        SpinnerNumberModel model = new SpinnerNumberModel(fontSize, 12, 48, 1);
+        chooseFontSize = new JSpinner(model);
         c.gridx = 1;
         contentPane.add(chooseFontSize, c);
         
@@ -158,7 +162,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         int tabSize = preferences.getTabSize();
         chooseTheme.setSelectedItem(theme.getName());
         chooseFontFamily.setSelectedItem(font.getFamily());
-        chooseFontSize.setSelectedItem(String.valueOf(font.getSize()));
+        chooseFontSize.setValue(font.getSize());
         chooseFgColor.setBackground(fgcolor);
         chooseBgColor.setBackground(bgcolor);
         chooseTabSize.setSelectedItem(String.valueOf(tabSize));
@@ -206,7 +210,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
             Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
             preferences.setTabSize(tabSize);
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
-            Integer fontSize = Integer.parseInt((String) chooseFontSize.getSelectedItem());
+            Integer fontSize = (Integer) chooseFontSize.getValue();
             Font font = new Font(fontFamily, Font.PLAIN, fontSize);
             preferences.setFont(font);
             File directory = fileChooser.getSelectedFile();
