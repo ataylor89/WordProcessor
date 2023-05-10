@@ -100,6 +100,9 @@ public class Settings {
                     background = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
                 }
             }
+            if (properties.containsKey("TAB_SIZE")) {
+                tabSize = Integer.parseInt(properties.getProperty("TAB_SIZE"));
+            }
             if (properties.containsKey("FONT")) {
                 String selection = properties.getProperty("FONT");
                 Matcher matcher = fontPattern.matcher(selection);
@@ -108,9 +111,6 @@ public class Settings {
                     Integer fontSize = Integer.parseInt(matcher.group(2));
                     font = new Font(fontFamily, Font.PLAIN, fontSize);
                 }
-            }
-            if (properties.containsKey("TAB_SIZE")) {
-                tabSize = Integer.parseInt(properties.getProperty("TAB_SIZE"));
             }
             if (properties.containsKey("DIRECTORY")) {
                 String path = properties.getProperty("DIRECTORY");
