@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 
 /**
@@ -23,12 +24,14 @@ public class Settings {
     private Color background;
     private Font font;
     private int tabSize;
+    private File directory;
     private final Pattern colorPattern, fontPattern;
     
     private Settings() {
         theme = Theme.SEA;
         tabSize = 4;
         font = new Font("SansSerif", Font.PLAIN, 12);
+        directory = new File(System.getProperty("user.home"));
         colorPattern = Pattern.compile("rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
         fontPattern = Pattern.compile("([a-zA-Z1-9 ]+),(\\d+)");
     }
@@ -154,6 +157,14 @@ public class Settings {
         return font;
     }
     
+    public void setDirectory(File directory) {
+        this.directory = directory;
+    }
+    
+    public File getDirectory() {
+        return directory;
+    }
+    
     public void setGui(WordProcessor wp) {
         this.wp = wp;
     }
@@ -168,5 +179,7 @@ public class Settings {
         textArea.setBackground(background);
         textArea.setTabSize(tabSize);
         textArea.setFont(font);
+        JFileChooser fileChooser = wp.getFileChooser();
+        fileChooser.setCurrentDirectory(directory);
     }
 }

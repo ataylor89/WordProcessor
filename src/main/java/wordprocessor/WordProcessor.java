@@ -121,6 +121,10 @@ public class WordProcessor extends JFrame implements ActionListener {
         return textArea;
     }
     
+    public JFileChooser getFileChooser() {
+        return fileChooser;
+    }
+    
     public void newFile() {
         file = null;
         textArea.setText("");
