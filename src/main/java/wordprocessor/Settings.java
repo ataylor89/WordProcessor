@@ -22,8 +22,8 @@ public class Settings {
     private Theme theme;
     private Color foreground;
     private Color background;
-    private Font font;
     private int tabSize;
+    private Font font;
     private File directory;
     private final Pattern colorPattern, fontPattern;
     
