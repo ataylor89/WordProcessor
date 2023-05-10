@@ -26,8 +26,8 @@ public class SettingsDialog extends JDialog implements ActionListener {
     
     private JPanel contentPane;
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily, chooseFontSize;
-    private JButton chooseFgColor, chooseBgColor, chooseDirectory;
     private JLabel directoryPath;
+    private JButton chooseFgColor, chooseBgColor, chooseDirectory;
     private JFileChooser fileChooser;
     private JButton save, cancel;
     
