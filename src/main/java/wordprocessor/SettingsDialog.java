@@ -201,14 +201,14 @@ public class SettingsDialog extends JDialog implements ActionListener {
             String themeName = (String) chooseTheme.getSelectedItem();
             Theme theme = Theme.forName(themeName);
             settings.setTheme(theme);
-            settings.setBackground(chooseBgColor.getBackground());
             settings.setForeground(chooseFgColor.getBackground());
+            settings.setBackground(chooseBgColor.getBackground());
+            Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
+            settings.setTabSize(tabSize);
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
             Integer fontSize = Integer.parseInt((String) chooseFontSize.getSelectedItem());
             Font font = new Font(fontFamily, Font.PLAIN, fontSize);
             settings.setFont(font);
-            Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
-            settings.setTabSize(tabSize);
             File directory = fileChooser.getSelectedFile();
             if (directory != null) {
                 settings.setDirectory(directory);
