@@ -30,7 +30,8 @@ public class PreferencesDialog extends JDialog implements ActionListener {
     private JComboBox chooseTheme, chooseTabSize, chooseFontFamily;
     private JSpinner chooseFontSize;
     private JLabel directoryPath;
-    private JButton chooseFgColor, chooseBgColor, chooseDirectory;
+    private ColorSample chooseFgColor, chooseBgColor;
+    private JButton chooseDirectory;
     private JFileChooser fileChooser;
     private JButton apply, cancel;
     
@@ -70,7 +71,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.weightx = 1;
         contentPane.add(fgcolorLabel, c);
         
-        chooseFgColor = new JButton();
+        chooseFgColor = new ColorSample(preferences.getForeground());
         chooseFgColor.setPreferredSize(new Dimension(24, 24));
         chooseFgColor.addActionListener(this);
         c.gridx = 1;
@@ -81,7 +82,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.gridy = 2;
         contentPane.add(bgcolorLabel, c);
               
-        chooseBgColor = new JButton();
+        chooseBgColor = new ColorSample(preferences.getBackground());
         chooseBgColor.setPreferredSize(new Dimension(24, 24));
         chooseBgColor.addActionListener(this);
         c.gridx = 1;
@@ -163,8 +164,10 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         chooseTheme.setSelectedItem(theme.getName());
         chooseFontFamily.setSelectedItem(font.getFamily());
         chooseFontSize.setValue(font.getSize());
-        chooseFgColor.setBackground(fgcolor);
-        chooseBgColor.setBackground(bgcolor);
+        chooseFgColor.setColor(fgcolor);
+        chooseBgColor.setColor(bgcolor);
+        chooseFgColor.repaint();
+        chooseBgColor.repaint();
         chooseTabSize.setSelectedItem(String.valueOf(tabSize));
     }
     
@@ -175,15 +178,18 @@ public class PreferencesDialog extends JDialog implements ActionListener {
             String name = (String) chooseTheme.getSelectedItem();
             if (!name.equals("Custom")) {
                 Theme theme = Theme.forName(name);
-                chooseFgColor.setBackground(theme.getForeground());
-                chooseBgColor.setBackground(theme.getBackground());
+                chooseFgColor.setColor(theme.getForeground());
+                chooseBgColor.setColor(theme.getBackground());
+                chooseFgColor.repaint();
+                chooseBgColor.repaint();
             }
         }
         else if (e.getSource() == chooseFgColor) {
             Color initial = preferences.getForeground();
             Color choice = JColorChooser.showDialog(this, "Chooose foreground color", initial);
             if (choice != null) {
-                chooseFgColor.setBackground(choice);
+                chooseFgColor.setColor(choice);
+                chooseFgColor.repaint();
                 chooseTheme.setSelectedItem("Custom");
             }
         }
@@ -191,7 +197,8 @@ public class PreferencesDialog extends JDialog implements ActionListener {
             Color initial = preferences.getBackground();
             Color choice = JColorChooser.showDialog(this, "Chooose background color", initial);
             if (choice != null) {
-                chooseBgColor.setBackground(choice);
+                chooseBgColor.setColor(choice);
+                chooseBgColor.repaint();
                 chooseTheme.setSelectedItem("Custom");
             }
         }
@@ -205,8 +212,8 @@ public class PreferencesDialog extends JDialog implements ActionListener {
             String themeName = (String) chooseTheme.getSelectedItem();
             Theme theme = Theme.forName(themeName);
             preferences.setTheme(theme);
-            preferences.setForeground(chooseFgColor.getBackground());
-            preferences.setBackground(chooseBgColor.getBackground());
+            preferences.setForeground(chooseFgColor.getColor());
+            preferences.setBackground(chooseBgColor.getColor());
             Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
             preferences.setTabSize(tabSize);
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
