@@ -71,7 +71,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.weightx = 1;
         contentPane.add(fgcolorLabel, c);
         
-        chooseFgColor = new ColorSample(preferences.getForeground(), 24, 24);
+        chooseFgColor = new ColorSample(preferences.getForeground(), 16, 16);
         chooseFgColor.addActionListener(this);
         c.gridx = 1;
         contentPane.add(chooseFgColor, c);
@@ -81,7 +81,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.gridy = 2;
         contentPane.add(bgcolorLabel, c);
               
-        chooseBgColor = new ColorSample(preferences.getBackground(), 24, 24);
+        chooseBgColor = new ColorSample(preferences.getBackground(), 16, 16);
         chooseBgColor.addActionListener(this);
         c.gridx = 1;
         contentPane.add(chooseBgColor, c);
