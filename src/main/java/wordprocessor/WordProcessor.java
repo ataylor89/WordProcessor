@@ -97,6 +97,12 @@ public class WordProcessor extends JFrame implements ActionListener {
     
     private void setupKeyListener() {
         ActionMap am = textArea.getActionMap();
+        Action cmdA = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                textArea.selectAll();
+            }
+        };
         Action cmdS = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,11 +115,13 @@ public class WordProcessor extends JFrame implements ActionListener {
                 openFile();
             }
         };
+        am.put("cmd+a", cmdA);
         am.put("cmd+s", cmdS);
         am.put("cmd+o", cmdO);
         InputMap im = textArea.getInputMap();
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), "cmd+a");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.META_DOWN_MASK), "cmd+s");
 	im.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.META_DOWN_MASK), "cmd+o");
     }
