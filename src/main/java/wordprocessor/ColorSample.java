@@ -1,6 +1,7 @@
 package wordprocessor;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JButton;
 
@@ -12,8 +13,9 @@ public class ColorSample extends JButton {
     
     private Color color;
     
-    public ColorSample(Color color) {
+    public ColorSample(Color color, int width, int height) {
         super();
+        super.setPreferredSize(new Dimension(width, height));
         this.color = color;
     }
     
