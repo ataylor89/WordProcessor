@@ -28,8 +28,8 @@ public class PreferencesDialog extends JDialog implements ActionListener {
     private JPanel contentPane;
     private JComboBox chooseTheme, chooseFontFamily;
     private JSpinner chooseTabSize, chooseFontSize;
-    private JLabel directoryPath;
     private ColorSample chooseFgColor, chooseBgColor;
+    private JLabel directoryPath;
     private JButton chooseDirectory;
     private JFileChooser fileChooser;
     private JButton apply, cancel;
