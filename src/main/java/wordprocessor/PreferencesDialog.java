@@ -1,7 +1,6 @@
 package wordprocessor;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -27,8 +26,8 @@ import javax.swing.SpinnerNumberModel;
 public class PreferencesDialog extends JDialog implements ActionListener {
     
     private JPanel contentPane;
-    private JComboBox chooseTheme, chooseTabSize, chooseFontFamily;
-    private JSpinner chooseFontSize;
+    private JComboBox chooseTheme, chooseFontFamily;
+    private JSpinner chooseTabSize, chooseFontSize;
     private JLabel directoryPath;
     private ColorSample chooseFgColor, chooseBgColor;
     private JButton chooseDirectory;
@@ -90,9 +89,10 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         c.gridx = 0;
         c.gridy = 3;
         contentPane.add(tabSizeLabel, c);
-        
-        String[] tabSizes = new String[] {"1", "2", "3", "4", "5", "6", "7", "8"};
-        chooseTabSize = new JComboBox(tabSizes);
+               
+        int tabSize = preferences.getTabSize();
+        SpinnerNumberModel tabSizeModel = new SpinnerNumberModel(tabSize, 1, 8, 1);
+        chooseTabSize = new JSpinner(tabSizeModel);
         c.gridx = 1;
         contentPane.add(chooseTabSize, c);
         
@@ -112,8 +112,8 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         contentPane.add(fontSizeLabel, c);
              
         int fontSize = preferences.getFont().getSize();
-        SpinnerNumberModel model = new SpinnerNumberModel(fontSize, 12, 48, 1);
-        chooseFontSize = new JSpinner(model);
+        SpinnerNumberModel fontSizeModel = new SpinnerNumberModel(fontSize, 12, 48, 1);
+        chooseFontSize = new JSpinner(fontSizeModel);
         c.gridx = 1;
         contentPane.add(chooseFontSize, c);
         
@@ -166,7 +166,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
         chooseBgColor.setColor(bgcolor);
         chooseFgColor.repaint();
         chooseBgColor.repaint();
-        chooseTabSize.setSelectedItem(String.valueOf(tabSize));
+        chooseTabSize.setValue(tabSize);
     }
     
     @Override
@@ -212,7 +212,7 @@ public class PreferencesDialog extends JDialog implements ActionListener {
             preferences.setTheme(theme);
             preferences.setForeground(chooseFgColor.getColor());
             preferences.setBackground(chooseBgColor.getColor());
-            Integer tabSize = Integer.parseInt((String) chooseTabSize.getSelectedItem());
+            Integer tabSize = (Integer) chooseTabSize.getValue();
             preferences.setTabSize(tabSize);
             String fontFamily = (String) chooseFontFamily.getSelectedItem();
             Integer fontSize = (Integer) chooseFontSize.getValue();
