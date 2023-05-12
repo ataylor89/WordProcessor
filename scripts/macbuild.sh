@@ -1,4 +1,4 @@
-if [ ! -f icons.icns ]; then
+if [ ! -f icons/icons.icns ]; then
     ICON="icons/WordProcessor.png"   
     mkdir icons/icons.iconset
     sips -z 512 512   $ICON --out icons/icons.iconset/icon_512x512.png
@@ -24,5 +24,4 @@ jpackage --input target/ \
   --vendor "Andrew's software" \
   --copyright "Copyright 2021" \
   --mac-package-name "Word Processor" \
-  --verbose \
-  --java-options '--enable-preview'
+  --verbose
