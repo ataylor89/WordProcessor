@@ -38,7 +38,8 @@ public enum Theme {
     public static Theme forName(String name) {
         return Stream.of(values())
                 .filter(theme -> theme.getName().equals(name))
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(CUSTOM);
     }
     
     public static String[] getNames() {

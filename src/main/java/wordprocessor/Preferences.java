@@ -28,7 +28,7 @@ public class Preferences {
     private static Preferences instance;
     
     private Preferences() {
-        theme = Theme.SEA;
+        theme = Theme.CUSTOM;
         tabSize = 4;
         font = new Font("SansSerif", Font.PLAIN, 12);
         directory = new File(System.getProperty("user.home"));
@@ -63,29 +63,33 @@ public class Preferences {
             if (properties.containsKey("THEME")) {
                 String themeName = properties.getProperty("THEME");
                 theme = Theme.forName(themeName);
+                foreground = theme.getForeground();
+                background = theme.getBackground();
             }
-            if (properties.containsKey("FOREGROUND_COLOR")) {
-                String fgcolor = properties.getProperty("FOREGROUND_COLOR");
-                Matcher matcher = colorPattern.matcher(fgcolor);
-                if (matcher.matches()) {
-                    int[] rgba = new int[4];
-                    rgba[0] = Integer.parseInt(matcher.group(1));
-                    rgba[1] = Integer.parseInt(matcher.group(2));
-                    rgba[2] = Integer.parseInt(matcher.group(3));
-                    rgba[3] = Integer.parseInt(matcher.group(4));
-                    foreground = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+            if (theme == Theme.CUSTOM) {               
+                if (properties.containsKey("FOREGROUND_COLOR")) {
+                    String fgcolor = properties.getProperty("FOREGROUND_COLOR");
+                    Matcher matcher = colorPattern.matcher(fgcolor);
+                    if (matcher.matches()) {
+                        int[] rgba = new int[4];
+                        rgba[0] = Integer.parseInt(matcher.group(1));
+                        rgba[1] = Integer.parseInt(matcher.group(2));
+                        rgba[2] = Integer.parseInt(matcher.group(3));
+                        rgba[3] = Integer.parseInt(matcher.group(4));
+                        foreground = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+                    }
                 }
-            }
-            if (properties.containsKey("BACKGROUND_COLOR")) {
-                String bgcolor = properties.getProperty("BACKGROUND_COLOR");   
-                Matcher matcher = colorPattern.matcher(bgcolor);
-                if (matcher.matches()) {
-                    int[] rgba = new int[4];
-                    rgba[0] = Integer.parseInt(matcher.group(1));
-                    rgba[1] = Integer.parseInt(matcher.group(2));
-                    rgba[2] = Integer.parseInt(matcher.group(3));
-                    rgba[3] = Integer.parseInt(matcher.group(4));
-                    background = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+                if (properties.containsKey("BACKGROUND_COLOR")) {
+                    String bgcolor = properties.getProperty("BACKGROUND_COLOR");   
+                    Matcher matcher = colorPattern.matcher(bgcolor);
+                    if (matcher.matches()) {
+                        int[] rgba = new int[4];
+                        rgba[0] = Integer.parseInt(matcher.group(1));
+                        rgba[1] = Integer.parseInt(matcher.group(2));
+                        rgba[2] = Integer.parseInt(matcher.group(3));
+                        rgba[3] = Integer.parseInt(matcher.group(4));
+                        background = new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
+                    }
                 }
             }
             if (properties.containsKey("TAB_SIZE")) {
