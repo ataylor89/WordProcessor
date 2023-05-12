@@ -49,7 +49,7 @@ public class Preferences {
             load(file);
         } 
         else {
-            file = new File(System.getProperty("user.dir"), ".wordprocessor");
+            file = new File("src/main/resources", "wordprocessor.properties");
             if (file.exists()) {
                 load(file);
             }
