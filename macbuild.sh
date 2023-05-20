@@ -1,8 +1,8 @@
 if [ ! -f icons/icons.icns ]; then
     ICON="icons/WordProcessor.png"   
     mkdir icons/icons.iconset
+    cp $ICON icons/icons.iconset/icon_512x512@2x.png
     sips -z 512 512   $ICON --out icons/icons.iconset/icon_512x512.png
-    cp $ICON icons.iconset/icon_512x512@2x.png
     sips -z 512 512   $ICON --out icons/icons.iconset/icon_256x256@2x.png
     sips -z 256 256   $ICON --out icons/icons.iconset/icon_256x256.png
     sips -z 256 256   $ICON --out icons/icons.iconset/icon_128x128@2x.png
