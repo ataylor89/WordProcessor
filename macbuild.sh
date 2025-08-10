@@ -1,3 +1,4 @@
+# If the icon set doesn't exist, then create the icon set
 if [ ! -f icons/icons.icns ]; then
     ICON="icons/WordProcessor.png"   
     mkdir icons/icons.iconset
@@ -13,7 +14,11 @@ if [ ! -f icons/icons.icns ]; then
     sips -z 16 16     $ICON --out icons/icons.iconset/icon_16x16.png
     iconutil -c icns icons/icons.iconset --output icons/icons.icns
 fi
+
+# Compile the code and package the bytecode as a jar file
 mvn clean install
+
+# Create a MacOS application using jpackage
 jpackage --input target/ \
   --name WordProcessor \
   --main-jar WordProcessor.jar \
@@ -21,7 +26,5 @@ jpackage --input target/ \
   --type dmg \
   --icon "icons/icons.icns" \
   --app-version "1.0.0" \
-  --vendor "Andrew's software" \
-  --copyright "Copyright 2021" \
   --mac-package-name "Word Processor" \
   --verbose
