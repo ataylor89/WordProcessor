@@ -160,6 +160,12 @@ public class WordProcessor extends JFrame implements ActionListener {
     public void openFile() {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             this.file = fileChooser.getSelectedFile();
+            openFile(file);
+        }
+    }
+
+    public void openFile(File file) {
+        if (file.exists()) {
             try {
                 String text = Files.readString(file.toPath());
                 textArea.setText(text);
@@ -191,5 +197,9 @@ public class WordProcessor extends JFrame implements ActionListener {
     public static void main(String[] args) {
         WordProcessor wp = new WordProcessor();
         wp.createAndShowGui();
+        if (args.length == 1) {
+            String filename = args[0];
+            wp.openFile(new File(filename));
+        }
     }
 }
