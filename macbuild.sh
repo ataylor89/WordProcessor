@@ -19,7 +19,7 @@ fi
 mvn clean install
 
 # Create a MacOS application using jpackage
-jpackage --input target/ \
+jpackage --input target \
   --name WordProcessor \
   --main-jar WordProcessor.jar \
   --main-class wordprocessor.WordProcessor \
