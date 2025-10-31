@@ -1,4 +1,4 @@
-# If the icon set doesn't exist, then create the icon set
+# Create the icons.icns file if needed
 if [ ! -f icons/icons.icns ]; then
     ICON="icons/WordProcessor.png"   
     mkdir icons/icons.iconset
